@@ -50,7 +50,7 @@ export const jobSeekers = pgTable(
     skills: json("skills").$type<string[]>(),
     experience: text("experience"),
     education: text("education"),
-    qrCode: text("qr_code").unique(),
+    pin: text("pin").unique(), // 6-digit PIN for verification
     ticketNumber: text("ticket_number").unique(),
     registrationStatus: text("registration_status").$type<"pending" | "approved" | "rejected">().default("pending"),
     interestCategories: json("interest_categories").$type<string[]>(),
@@ -58,12 +58,14 @@ export const jobSeekers = pgTable(
     portfolioUrl: text("portfolio_url"),
     expectedSalary: decimal("expected_salary"),
     availableFrom: timestamp("available_from"),
+    pinGeneratedAt: timestamp("pin_generated_at"), // Track when PIN was generated
+    pinExpiresAt: timestamp("pin_expires_at"), // PIN expiration time
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => ({
     userIdIdx: index("job_seeker_user_id_idx").on(table.userId),
-    qrCodeIdx: index("job_seeker_qr_code_idx").on(table.qrCode),
+    pinIdx: index("job_seeker_pin_idx").on(table.pin),
     ticketNumberIdx: index("job_seeker_ticket_number_idx").on(table.ticketNumber),
     statusIdx: index("job_seeker_status_idx").on(table.registrationStatus),
   })
@@ -275,8 +277,8 @@ export const attendanceRecords = pgTable(
     verifiedBy: text("verified_by").references(() => securityPersonnel.id, { onDelete: "set null" }),
     checkInTime: timestamp("check_in_time").defaultNow().notNull(),
     checkOutTime: timestamp("check_out_time"),
-    verificationMethod: text("verification_method").$type<"qr_code" | "ticket_number" | "manual">().notNull(),
-    verificationData: text("verification_data"), // QR code or ticket number used
+    verificationMethod: text("verification_method").$type<"pin" | "ticket_number" | "manual">().notNull(),
+    verificationData: text("verification_data"), // PIN or ticket number used
     status: text("status").$type<"checked_in" | "checked_out" | "flagged">().default("checked_in"),
     notes: text("notes"),
     ipAddress: text("ip_address"),

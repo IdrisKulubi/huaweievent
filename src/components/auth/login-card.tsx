@@ -2,56 +2,78 @@
 
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { Briefcase, Users, Calendar, MapPin } from "lucide-react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 
 export function LoginCard() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
     <div className="relative w-full max-w-md">
-      {/* Decorative elements */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-20 right-10 text-pink-500/10 text-8xl select-none animate-float"
-      >
-        💝
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute -top-16 left-10 text-pink-500/10 text-7xl select-none rotate-[-15deg] animate-float delay-150"
-      >
-        ✨
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-16 right-20 text-pink-500/10 text-6xl select-none rotate-12 animate-float delay-300"
-      >
-        💫
-      </div>
-
+      {/* Decorative background elements */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-huawei-gradient rounded-full blur-xl animate-bounce-gentle opacity-20"></div>
+      <div className="absolute bottom-16 right-16 w-32 h-32 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full blur-2xl animate-bounce-gentle opacity-15" style={{ animationDelay: '1s' }}></div>
+      
       {/* Main content */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative bg-white/50 dark:bg-background/50 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-pink-100 dark:border-pink-950"
-      >
+      <div className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-700 transition-all duration-1000 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
         <div className="space-y-6">
           {/* Logo and Title */}
-          <div className="text-center space-y-2">
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="text-6xl animate-bounce">💘</div>
-                <div className="absolute -right-3 -top-3 text-3xl animate-pulse">
-                  ✨
-                </div>
-              </div>
+          <div className="text-center space-y-4">
+            {/* Logos */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <Image
+                src="/huaweilogo.png"
+                alt="Huawei"
+                width={100}
+                height={40}
+                className="object-contain"
+              />
+              <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
+              <Image
+                src="/nationlogo.png"
+                alt="Nation Media Group"
+                width={80}
+                height={32}
+                className="object-contain"
+              />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-pink-700 dark:from-pink-400 dark:to-pink-600 bg-clip-text text-transparent">
-              StrathSpace
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Find your perfect match at Strathspace 💖
-            </p>
+
+            <div className="space-y-2">
+              <h1 className="text-2xl md:text-3xl font-bold">
+                <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-slate-100 dark:via-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
+                  Career Summit
+                </span>
+                <br />
+                <span className="text-red-500 bg-clip-text ">
+                  Access Portal
+                </span>
+              </h1>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                Sign in to access the Huawei Career Summit platform
+              </p>
+            </div>
           </div>
+
+          {/* Event Info Cards */}
+          <div className="grid grid-cols-2 gap-3 my-6">
+            <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
+              <Calendar className="w-4 h-4 text-[var(--huawei-red)] mx-auto mb-1" />
+              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Dec 15-16</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">2024</p>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
+              <MapPin className="w-4 h-4 text-blue-600 mx-auto mb-1" />
+              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">KICC</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Nairobi</p>
+            </div>
+          </div>
+
+        
 
           {/* Sign in form */}
           <form
@@ -61,9 +83,9 @@ export function LoginCard() {
             }}
             className="space-y-4"
           >
-            <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-700 dark:from-pink-400 dark:to-pink-600 hover:opacity-90 transition-opacity text-white font-medium py-6 text-lg">
+            <Button className="w-full bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 py-6 text-base font-medium">
               <svg
-                className="mr-2 h-5 w-5"
+                className="mr-3 h-5 w-5"
                 aria-hidden="true"
                 viewBox="0 0 24 24"
               >
@@ -86,47 +108,47 @@ export function LoginCard() {
               </svg>
               Continue with Google
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Use your university email to sign in ✨
+            
+            <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+              Use your professional email to access the platform
             </p>
           </form>
 
-          {/* Spotify Sign in form
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              signIn("spotify", { callbackUrl: "/" });
-            }}
-            className="space-y-4"
-          >
-            <Button className="w-full bg-[#1DB954] hover:bg-[#1DB954]/90 transition-opacity text-white font-medium py-6 text-lg">
-              <svg
-                className="mr-2 h-5 w-5"
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-              </svg>
-              Continue with Spotify
-            </Button>
-          </form> */}
+          {/* Stats */}
+          <div className="border-t border-slate-200 dark:border-slate-600 pt-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-lg font-bold text-red-500 bg-clip-text">50+</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Companies</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">200+</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Positions</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">1000+</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Attendees</p>
+              </div>
+            </div>
+          </div>
 
           {/* Footer */}
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
             <p>By continuing, you agree to our</p>
-            <p className="space-x-1">
-              <span className="text-pink-600 dark:text-pink-400 hover:underline cursor-pointer">
+            <div className="flex justify-center gap-4">
+              <span className="text-[var(--huawei-red)] hover:underline cursor-pointer">
                 Terms of Service
               </span>
-              <span>and</span>
-              <span className="text-pink-600 dark:text-pink-400 hover:underline cursor-pointer">
+              <span className="text-blue-600 hover:underline cursor-pointer">
                 Privacy Policy
               </span>
-            </p>
+            </div>
           </div>
         </div>
-      </motion.div>
+
+        {/* Decorative gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-100/20 dark:to-slate-600/10 rounded-3xl pointer-events-none"></div>
+      </div>
     </div>
   );
 }
