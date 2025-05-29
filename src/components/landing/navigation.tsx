@@ -2,10 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/shared/mode-toggle";
+import { UserAccount } from "@/components/auth/user-account";
 import { Menu, X, Calendar, Users, Info, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const navigationLinks = [
   { name: "About", href: "#about", icon: Info },
@@ -17,6 +19,7 @@ const navigationLinks = [
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,13 +97,20 @@ export function Navigation() {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            {/* CTA Button */}
-            <Button 
-              size="sm" 
-              className="hidden md:flex bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-            >
-              Register Now
-            </Button>
+            {/* User Account or CTA Button */}
+            {session?.user ? (
+              <UserAccount />
+            ) : (
+              <Button 
+                asChild
+                size="sm" 
+                className="hidden md:flex bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
+              >
+                <Link href="/auth/register">
+                  Register Now
+                </Link>
+              </Button>
+            )}
 
             {/* Theme Toggle */}
             <ModeToggle />
@@ -144,20 +154,34 @@ export function Navigation() {
 
             {/* Mobile CTA */}
             <div className="space-y-3">
-              <Button 
-                className="w-full bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-md"
-                onClick={() => setIsOpen(false)}
-              >
-                Register Now
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-                onClick={() => setIsOpen(false)}
-              >
-                Learn More
-              </Button>
+              {session?.user ? (
+                <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  <UserAccount />
+                </div>
+              ) : (
+                <>
+                  <Button 
+                    asChild
+                    className="w-full bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-md"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Link href="/auth/register">
+                      Register Now
+                    </Link>
+                  </Button>
+                  
+                  <Button 
+                    asChild
+                    variant="outline" 
+                    className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Link href="/auth/login">
+                      Sign In
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile Logos */}
