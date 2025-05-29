@@ -10,8 +10,8 @@ const twitterSite = TWITTER_SITE
   : undefined;
   
 export function constructMetadata({
-  title = "Buzzvar - Find Your Crew ,Find Your Club",
-  description = "Buzzvar: Your university night, simplified. Find clubs, deals, and party groups instantly.",
+  title = "Job Fair 2025",
+  description = "Job Fair 2025 - Huawei",
   image = "https://res.cloudinary.com/db0i0umxn/image/upload/v1747817579/Screenshot_2025-05-2115227_vxo86w.png",
   icons = "/favicon.ico",
   noIndex = false,
