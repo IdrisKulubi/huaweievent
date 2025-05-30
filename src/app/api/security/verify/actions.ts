@@ -1,9 +1,35 @@
 "use server";
 
 import db from "@/db/drizzle";
-import { jobSeekers, users, attendanceRecords, events } from "@/db/schema";
+import { jobSeekers, users, attendanceRecords, events, securityPersonnel } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { validatePinFormat, validateTicketNumberFormat } from "@/lib/utils/security";
+
+/**
+ * Validates and resolves security ID to ensure it exists in security_personnel table
+ * For admin users, returns null to allow verification without security personnel reference
+ */
+async function validateSecurityId(securityId: string): Promise<string | null> {
+  // Check if this is an admin-generated mock ID
+  if (securityId.startsWith('admin-')) {
+    // For admin users, we'll set verifiedBy to null
+    // This allows admin verification without foreign key constraint issues
+    return null;
+  }
+
+  // For regular security personnel, verify the ID exists
+  const securityExists = await db
+    .select({ id: securityPersonnel.id })
+    .from(securityPersonnel)
+    .where(eq(securityPersonnel.id, securityId))
+    .limit(1);
+
+  if (securityExists.length === 0) {
+    throw new Error(`Invalid security personnel ID: ${securityId}`);
+  }
+
+  return securityId;
+}
 
 export async function verifyAttendeePin(pin: string, securityId: string) {
   try {
@@ -14,6 +40,9 @@ export async function verifyAttendeePin(pin: string, securityId: string) {
         message: "Invalid PIN format. Please enter a 6-digit PIN."
       };
     }
+
+    // Validate security ID and get the resolved ID (or null for admins)
+    const validatedSecurityId = await validateSecurityId(securityId);
 
     // Find job seeker by PIN
     const jobSeeker = await db
@@ -80,17 +109,23 @@ export async function verifyAttendeePin(pin: string, securityId: string) {
 
     const alreadyCheckedIn = existingCheckIn.length > 0;
 
-    // Create attendance record even if already checked in (for audit trail)
-    await db.insert(attendanceRecords).values({
+    // Create attendance record with proper verifiedBy handling
+    const attendanceData: any = {
       id: crypto.randomUUID(),
       jobSeekerId: attendee.id,
       eventId: activeEvent[0].id,
-      verifiedBy: securityId,
       verificationMethod: "pin",
       verificationData: pin,
       status: "checked_in",
       notes: alreadyCheckedIn ? "Duplicate check-in attempt" : undefined,
-    });
+    };
+
+    // Only set verifiedBy if we have a valid security personnel ID
+    if (validatedSecurityId) {
+      attendanceData.verifiedBy = validatedSecurityId;
+    }
+
+    await db.insert(attendanceRecords).values(attendanceData);
 
     return {
       success: true,
@@ -127,6 +162,9 @@ export async function verifyAttendeeTicket(ticketNumber: string, securityId: str
         message: "Invalid ticket format. Expected format: HCS-YYYY-XXXXXXXX"
       };
     }
+
+    // Validate security ID and get the resolved ID (or null for admins)
+    const validatedSecurityId = await validateSecurityId(securityId);
 
     // Find job seeker by ticket number
     const jobSeeker = await db
@@ -190,17 +228,23 @@ export async function verifyAttendeeTicket(ticketNumber: string, securityId: str
 
     const alreadyCheckedIn = existingCheckIn.length > 0;
 
-    // Create attendance record
-    await db.insert(attendanceRecords).values({
+    // Create attendance record with proper verifiedBy handling
+    const attendanceData: any = {
       id: crypto.randomUUID(),
       jobSeekerId: attendee.id,
       eventId: activeEvent[0].id,
-      verifiedBy: securityId,
       verificationMethod: "ticket_number",
       verificationData: ticketNumber,
       status: "checked_in",
       notes: alreadyCheckedIn ? "Duplicate check-in attempt" : undefined,
-    });
+    };
+
+    // Only set verifiedBy if we have a valid security personnel ID
+    if (validatedSecurityId) {
+      attendanceData.verifiedBy = validatedSecurityId;
+    }
+
+    await db.insert(attendanceRecords).values(attendanceData);
 
     return {
       success: true,

@@ -27,6 +27,7 @@ interface Event {
   venue: string;
   startDate: Date;
   endDate: Date;
+  isActive: boolean;
 }
 
 interface BoothCreationModalProps {
@@ -161,9 +162,24 @@ export function BoothCreationModal({ events, trigger }: BoothCreationModalProps)
                   <SelectContent>
                     {events.map((event) => (
                       <SelectItem key={event.id} value={event.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{event.name}</span>
-                          <span className="text-sm text-gray-500">{event.venue}</span>
+                        <div className="flex flex-col py-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{event.name}</span>
+                            {event.isActive ? (
+                              <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {event.venue}
+                            </span>
+                            <span>
+                              {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </SelectItem>
                     ))}

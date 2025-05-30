@@ -6,8 +6,9 @@ import { eq, and, desc } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Settings, Plus, Users, Wrench } from "lucide-react";
+import { MapPin, Calendar, Settings, Plus, Users, Wrench, Building, Home } from "lucide-react";
 import { BoothCreationModal } from "@/components/employer/booth-creation-modal";
+import Link from "next/link";
 
 export default async function EmployerBoothsPage() {
   const session = await auth();
@@ -39,12 +40,18 @@ export default async function EmployerBoothsPage() {
     companyName: "Admin Portal Access",
   };
 
-  // Get active events
-  const activeEvents = await db
+  // Get events (all events for admin, active events for employers)
+  const eventsQuery = db
     .select()
     .from(events)
-    .where(eq(events.isActive, true))
     .orderBy(desc(events.startDate));
+    
+  // Only filter by active status if not admin
+  if (currentUser.role !== "admin") {
+    eventsQuery.where(eq(events.isActive, true));
+  }
+  
+  const activeEvents = await eventsQuery;
 
   // Get employer's booths
   const employerBooths = await db
@@ -72,17 +79,31 @@ export default async function EmployerBoothsPage() {
 
       {/* Admin Notice */}
       {currentUser.role === "admin" && !employerProfile[0] && (
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
           <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Settings className="h-5 w-5 text-orange-600" />
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Settings className="h-6 w-6 text-amber-600" />
               </div>
-              <div>
-                <h3 className="font-semibold text-orange-900">Admin Mode</h3>
-                <p className="text-orange-800 text-sm">
-                  You're viewing booth management as an administrator
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-900 mb-2">Admin Mode - Use Admin Interface</h3>
+                <p className="text-amber-800 text-sm mb-3">
+                  As an administrator, you should use the dedicated Admin Booth Management interface to create and manage booths for companies.
                 </p>
+                <div className="flex gap-3">
+                  <Button asChild className="bg-amber-600 hover:bg-amber-700 text-white">
+                    <Link href="/admin/booths">
+                      <Building className="h-4 w-4 mr-2" />
+                      Go to Admin Booth Management
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild className="border-amber-600 text-amber-700 hover:bg-amber-50">
+                    <Link href="/admin">
+                      <Home className="h-4 w-4 mr-2" />
+                      Admin Dashboard
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -99,26 +120,49 @@ export default async function EmployerBoothsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {activeEvents.map((event) => (
-                <div
+                <Card
                   key={event.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                  className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-50 via-white to-blue-50 group hover:scale-105"
                 >
-                  <h3 className="font-semibold text-gray-900">{event.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{event.venue}</p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
-                  </p>
-                  <BoothCreationModal 
-                    events={[event]} 
-                    trigger={
-                      <Button variant="outline" size="sm" className="mt-3 w-full">
-                        Setup Booth for This Event
-                      </Button>
-                    }
-                  />
-                </div>
+                  <CardContent className="p-6 relative">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-full -mr-8 -mt-8 group-hover:bg-blue-500/20 transition-colors duration-300" />
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold text-gray-900 text-lg truncate">{event.name}</h3>
+                        {event.isActive ? (
+                          <Badge className="bg-green-100 text-green-800 text-xs">Active</Badge>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <MapPin className="h-4 w-4 text-green-500" />
+                          <span className="truncate">{event.venue}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="h-4 w-4 text-blue-500" />
+                          <span className="text-xs">
+                            {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <BoothCreationModal 
+                        events={[event]} 
+                        trigger={
+                          <Button variant="outline" size="sm" className="w-full group-hover:bg-blue-50 transition-colors">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Setup Booth
+                          </Button>
+                        }
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </CardContent>

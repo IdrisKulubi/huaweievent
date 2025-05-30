@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CreateEventModal } from "@/components/admin/create-event-modal";
 import {
   Calendar,
   Settings,
@@ -26,23 +27,52 @@ import {
   Database,
   Bell,
   TrendingUp,
-  Zap
+  Zap,
+  Plus,
+  UserCheck
 } from "lucide-react";
 
-const navigationItems = [
-  {
-    title: "Overview",
-    href: "/admin",
-    icon: Home,
-  },
+interface NavigationSubItem {
+  title: string;
+  href: string;
+  icon: any;
+  isModal?: boolean;
+  modalType?: string;
+}
+
+interface NavigationItem {
+  title: string;
+  href?: string;
+  icon: any;
+  items?: NavigationSubItem[];
+}
+
+const navigationItems: NavigationItem[] = [
+  { title: "Dashboard", href: "/admin", icon: Home },
   {
     title: "Event Management",
     icon: Calendar,
     items: [
-      { title: "Event Settings", href: "/admin/events", icon: Settings },
-      { title: "Time Batches", href: "/admin/events/time-batches", icon: Clock },
+      { title: "All Events", href: "/admin/events", icon: Calendar },
+      { 
+        title: "Create Event", 
+        href: "/admin/events/create", 
+        icon: Plus,
+        isModal: true,
+        modalType: "createEvent"
+      },
+      // { title: "Active Event", href: "/admin/events/active", icon: Power },
+      // { title: "Event Analytics", href: "/admin/events/analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "Event Operations",
+    icon: Settings,
+    items: [
       { title: "Checkpoints", href: "/admin/events/checkpoints", icon: Shield },
+      { title: "Time Batches", href: "/admin/events/time-batches", icon: Clock },
       { title: "Crowd Control", href: "/admin/crowd-control", icon: Zap },
+      { title: "Booths Management", href: "/admin/booths", icon: Building },
     ],
   },
   {
@@ -51,19 +81,20 @@ const navigationItems = [
     items: [
       { title: "All Users", href: "/admin/users", icon: Users },
       { title: "Employers", href: "/admin/users/employers", icon: Building },
+      { title: "Job Seekers", href: "/admin/users/jobseekers", icon: UserCheck },
       { title: "Role Management", href: "/admin/users/roles", icon: UserCog },
     ],
   },
-  {
-    title: "Security & Access",
-    icon: Shield,
-    items: [
-      { title: "Security Personnel", href: "/admin/security/personnel", icon: Shield },
-      { title: "PIN System", href: "/admin/security/pins", icon: Key },
-      { title: "Access Control", href: "/admin/security/access", icon: UserCog },
-      { title: "Security Incidents", href: "/admin/security/incidents", icon: AlertTriangle },
-    ],
-  },
+  // {
+  //   title: "Security & Access",
+  //   icon: Shield,
+  //   items: [
+  //     { title: "Security Personnel", href: "/admin/security/personnel", icon: Shield },
+  //     { title: "PIN System", href: "/admin/security/pins", icon: Key },
+  //     { title: "Access Control", href: "/admin/security/access", icon: UserCog },
+  //     { title: "Security Incidents", href: "/admin/security/incidents", icon: AlertTriangle },
+  //   ],
+  // },
   {
     title: "Reports & Analytics",
     icon: BarChart3,
@@ -71,20 +102,11 @@ const navigationItems = [
       { title: "Impact Reports", href: "/admin/reports", icon: TrendingUp },
       { title: "Attendance Reports", href: "/admin/reports/attendance", icon: Activity },
       { title: "User Analytics", href: "/admin/reports/users", icon: Users },
-      { title: "Event Analytics", href: "/admin/reports/events", icon: Calendar },
+      { title: "Event Performance", href: "/admin/reports/events", icon: Calendar },
       { title: "System Reports", href: "/admin/reports/system", icon: FileText },
     ],
   },
-  {
-    title: "System Monitoring",
-    icon: Monitor,
-    items: [
-      { title: "System Health", href: "/admin/system/health", icon: Activity },
-      { title: "Database Status", href: "/admin/system/database", icon: Database },
-      { title: "Logs & Audits", href: "/admin/system/logs", icon: FileText },
-      { title: "Notifications", href: "/admin/system/notifications", icon: Bell },
-    ],
-  },
+ 
 ];
 
 export function AdminSidebar() {
@@ -153,20 +175,38 @@ export function AdminSidebar() {
                 
                 {expandedSections.includes(item.title) && item.items && (
                   <div className="mt-1 space-y-1 pl-6">
-                    {item.items.map((subItem) => (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href}
-                        className={cn(
-                          "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-100 dark:hover:bg-slate-800",
-                          pathname === subItem.href
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
-                            : "text-slate-600 dark:text-slate-400"
+                    {item.items.map((subItem: NavigationSubItem) => (
+                      <div key={subItem.href}>
+                        {(subItem as any).isModal && (subItem as any).modalType === "createEvent" ? (
+                          <CreateEventModal
+                            trigger={
+                              <button
+                                className={cn(
+                                  "flex w-full items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 text-left",
+                                  "text-slate-600 dark:text-slate-400"
+                                )}
+                              >
+                                <subItem.icon className="h-4 w-4" />
+                                <span>{subItem.title}</span>
+                              </button>
+                            }
+                            defaultType="job_fair"
+                          />
+                        ) : (
+                          <Link
+                            href={subItem.href}
+                            className={cn(
+                              "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-100 dark:hover:bg-slate-800",
+                              pathname === subItem.href
+                                ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
+                                : "text-slate-600 dark:text-slate-400"
+                            )}
+                          >
+                            <subItem.icon className="h-4 w-4" />
+                            <span>{subItem.title}</span>
+                          </Link>
                         )}
-                      >
-                        <subItem.icon className="h-4 w-4" />
-                        <span>{subItem.title}</span>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -176,7 +216,7 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      {/* Huawei Job Fair Quick Actions */}
+      {/* Huawei Job Fair Quick Actions  */}
       <div className="border-t border-slate-200 dark:border-slate-700 p-4">
         <div className="rounded-lg bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-4">
           <h3 className="text-sm font-semibold text-red-900 dark:text-red-100 mb-2">

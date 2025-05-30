@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { verifyAttendeePin, verifyAttendeeTicket } from "@/app/api/security/verify/actions";
 import { CheckCircle, XCircle, AlertTriangle, User, Calendar, MapPin, Shield, Key } from "lucide-react";
+import { toast } from "sonner";
 
 interface PinVerificationFormProps {
   securityId: string;
@@ -20,10 +21,10 @@ interface VerificationResult {
   message: string;
   attendee?: {
     id: string;
-    name: string;
-    email: string;
-    pin: string;
-    ticketNumber: string;
+    name: string | null;
+    email: string | null;
+    pin: string | null;
+    ticketNumber: string | null;
     registrationStatus: string;
     checkInTime?: string;
     alreadyCheckedIn?: boolean;
@@ -38,24 +39,27 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
 
   const handlePinVerification = () => {
     if (!pinInput || pinInput.length !== 6) {
-      setResult({
-        success: false,
-        message: "Please enter a valid 6-digit PIN"
-      });
+      toast.error("Please enter a valid 6-digit PIN");
       return;
     }
 
     startTransition(async () => {
       try {
         const response = await verifyAttendeePin(pinInput, securityId);
-        setResult(response);
+        
         if (response.success) {
+          toast.success(response.message);
+          setResult(response);
           setPinInput("");
+        } else {
+          toast.error(response.message);
+          setResult(response);
         }
       } catch (error) {
+        toast.error("Verification failed. Please try again.");
         setResult({
           success: false,
-          message: "Verification failed. Please try again."
+          message: "Verification failed due to system error. Please try again."
         });
       }
     });
@@ -63,24 +67,27 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
 
   const handleTicketVerification = () => {
     if (!ticketInput) {
-      setResult({
-        success: false,
-        message: "Please enter a ticket number"
-      });
+      toast.error("Please enter a ticket number");
       return;
     }
 
     startTransition(async () => {
       try {
         const response = await verifyAttendeeTicket(ticketInput, securityId);
-        setResult(response);
+        
         if (response.success) {
+          toast.success(response.message);
+          setResult(response);
           setTicketInput("");
+        } else {
+          toast.error(response.message);
+          setResult(response);
         }
       } catch (error) {
+        toast.error("Verification failed. Please try again.");
         setResult({
           success: false,
-          message: "Verification failed. Please try again."
+          message: "Verification failed due to system error. Please try again."
         });
       }
     });
@@ -231,9 +238,9 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">
-                      {result.attendee.name}
+                      {result.attendee.name || 'N/A'}
                     </h3>
-                    <p className="text-gray-600">{result.attendee.email}</p>
+                    <p className="text-gray-600">{result.attendee.email || 'N/A'}</p>
                   </div>
                 </div>
                 <Badge 
@@ -252,17 +259,17 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
                 <div className="space-y-3">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm font-medium text-gray-500 mb-1">PIN Code</p>
-                    <p className="text-lg font-mono font-bold text-gray-900">{result.attendee.pin}</p>
+                    <p className="text-lg font-mono font-bold text-gray-900">{result.attendee.pin || 'N/A'}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm font-medium text-gray-500 mb-1">Ticket Number</p>
-                    <p className="text-base font-semibold text-gray-900">{result.attendee.ticketNumber}</p>
+                    <p className="text-base font-semibold text-gray-900">{result.attendee.ticketNumber || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm font-medium text-gray-500 mb-1">Registration Status</p>
-                    <Badge variant="outline" className="font-semibold">
+                    <Badge variant="outline" className="font-semibold text-gray-900">
                       {result.attendee.registrationStatus.toUpperCase()}
                     </Badge>
                   </div>

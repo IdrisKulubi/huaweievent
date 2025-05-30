@@ -1,13 +1,38 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { users, securityPersonnel, attendanceRecords, securityIncidents, checkpoints } from "@/db/schema";
-import { eq, desc, and, gte } from "drizzle-orm";
+import { eq, desc, and, gte, or, isNull } from "drizzle-orm";
 import { PinVerificationForm } from "@/components/security/pin-verification-form";
 import { IncidentReportForm } from "@/components/security/incident-report-form";
 import { AttendanceHistory } from "@/components/security/attendance-history";
 import { SecurityStats } from "@/components/security/security-stats";
 import { CheckpointSelector } from "@/components/security/checkpoint-selector";
 import { Checkpoint } from "@/lib/shared/types";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
+
+async function createAdminSecurityRecord(userId: string, userName: string) {
+  "use server";
+  
+  const securityId = `sec-admin-${userId}`;
+  
+  try {
+    await db.insert(securityPersonnel).values({
+      id: securityId,
+      userId,
+      badgeNumber: `ADMIN-${userId.slice(0, 8).toUpperCase()}`,
+      department: "Administration",
+      clearanceLevel: "advanced",
+      isOnDuty: true,
+      assignedCheckpoints: [],
+    });
+    
+    return securityId;
+  } catch (error) {
+    console.error("Failed to create admin security record:", error);
+    return null;
+  }
+}
 
 export default async function SecurityDashboard() {
   const session = await auth();
@@ -31,9 +56,17 @@ export default async function SecurityDashboard() {
       .where(eq(securityPersonnel.userId, session!.user!.id))
       .limit(1);
     security = securityProfile[0];
+  } else {
+    // For admins, check if they have a security personnel record
+    const adminSecurityProfile = await db
+      .select()
+      .from(securityPersonnel)
+      .where(eq(securityPersonnel.userId, session!.user!.id))
+      .limit(1);
+    security = adminSecurityProfile[0];
   }
 
-  // For admin users, create a mock security ID for functionality
+  // For admin users without security record, create a mock security ID for functionality
   const securityId = security?.id || `admin-${currentUser.id}`;
 
   // Get today's stats
@@ -77,25 +110,43 @@ export default async function SecurityDashboard() {
       {/* Admin Notice */}
       {isAdmin && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 shadow-sm">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-blue-900">
+                  Administrator Access
+                </h3>
+                <div className="mt-2 text-blue-800">
+                  <p>
+                    You are accessing the security dashboard as an administrator. 
+                    You can view all security activities and perform verification operations across all checkpoints.
+                  </p>
+                  {!security && (
+                    <p className="text-sm mt-2 text-blue-700">
+                      <strong>Note:</strong> You're using temporary admin access. Consider creating a security personnel record for better tracking.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-blue-900">
-                Administrator Access
-              </h3>
-              <div className="mt-2 text-blue-800">
-                <p>
-                  You are accessing the security dashboard as an administrator. 
-                  You can view all security activities and perform verification operations across all checkpoints.
-                </p>
-              </div>
-            </div>
+            {!security && (
+              <form action={async () => {
+                "use server";
+                await createAdminSecurityRecord(currentUser.id, currentUser.name);
+              }}>
+                <Button type="submit" variant="outline" size="sm" className="text-blue-700 border-blue-300 hover:bg-blue-100">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create Security Record
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       )}

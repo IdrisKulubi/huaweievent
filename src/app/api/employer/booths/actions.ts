@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { booths, employers, events, interviewSlots } from "@/db/schema";
+import { booths, employers, events, interviewSlots, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -21,7 +21,27 @@ export async function createOrUpdateBooth(formData: {
       return { success: false, message: "Authentication required" };
     }
 
-    // Get employer profile
+    // Check if user is admin
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    if (!user[0]) {
+      return { success: false, message: "User not found" };
+    }
+
+    // If user is admin, they can't create booths through employer interface
+    // They should use the admin interface instead
+    if (user[0].role === "admin") {
+      return { 
+        success: false, 
+        message: "Admins should use the admin booth management interface to create booths. Please go to Admin > Booth Management to create booths and assign them to companies." 
+      };
+    }
+
+    // Get employer profile for non-admin users
     const employerProfile = await db
       .select()
       .from(employers)
@@ -29,7 +49,7 @@ export async function createOrUpdateBooth(formData: {
       .limit(1);
 
     if (!employerProfile[0]) {
-      return { success: false, message: "Employer profile not found" };
+      return { success: false, message: "Employer profile not found. Please complete your company registration first." };
     }
 
     const employer = employerProfile[0];
