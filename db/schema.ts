@@ -347,6 +347,87 @@ export const feedback = pgTable(
   })
 );
 
+// Job Applications
+export const jobApplications = pgTable(
+  "job_application",
+  {
+    id: text("id").primaryKey(),
+    jobId: text("job_id").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+    jobSeekerId: text("job_seeker_id").notNull().references(() => jobSeekers.id, { onDelete: "cascade" }),
+    status: text("status").$type<"applied" | "reviewed" | "shortlisted" | "interview_scheduled" | "interviewed" | "offered" | "rejected" | "withdrawn">().default("applied"),
+    coverLetter: text("cover_letter"),
+    resumeUrl: text("resume_url"),
+    appliedAt: timestamp("applied_at").defaultNow().notNull(),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewedBy: text("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+    notes: text("notes"),
+    rating: integer("rating"), // 1-5 scale
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    jobIdx: index("job_application_job_idx").on(table.jobId),
+    jobSeekerIdx: index("job_application_job_seeker_idx").on(table.jobSeekerId),
+    statusIdx: index("job_application_status_idx").on(table.status),
+    appliedAtIdx: index("job_application_applied_at_idx").on(table.appliedAt),
+    reviewedByIdx: index("job_application_reviewed_by_idx").on(table.reviewedBy),
+  })
+);
+
+// Shortlists
+export const shortlists = pgTable(
+  "shortlist",
+  {
+    id: text("id").primaryKey(),
+    employerId: text("employer_id").notNull().references(() => employers.id, { onDelete: "cascade" }),
+    jobId: text("job_id").references(() => jobs.id, { onDelete: "cascade" }),
+    eventId: text("event_id").references(() => events.id, { onDelete: "cascade" }),
+    jobSeekerId: text("job_seeker_id").notNull().references(() => jobSeekers.id, { onDelete: "cascade" }),
+    listName: text("list_name").notNull().default("Main Shortlist"),
+    status: text("status").$type<"interested" | "maybe" | "not_interested" | "contacted" | "interviewed" | "offered">().default("interested"),
+    priority: text("priority").$type<"high" | "medium" | "low">().default("medium"),
+    notes: text("notes"),
+    tags: json("tags").$type<string[]>(),
+    addedBy: text("added_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    employerIdx: index("shortlist_employer_idx").on(table.employerId),
+    jobIdx: index("shortlist_job_idx").on(table.jobId),
+    jobSeekerIdx: index("shortlist_job_seeker_idx").on(table.jobSeekerId),
+    statusIdx: index("shortlist_status_idx").on(table.status),
+    priorityIdx: index("shortlist_priority_idx").on(table.priority),
+    addedByIdx: index("shortlist_added_by_idx").on(table.addedBy),
+  })
+);
+
+// Real-time candidate tracking
+export const candidateInteractions = pgTable(
+  "candidate_interaction",
+  {
+    id: text("id").primaryKey(),
+    employerId: text("employer_id").notNull().references(() => employers.id, { onDelete: "cascade" }),
+    jobSeekerId: text("job_seeker_id").notNull().references(() => jobSeekers.id, { onDelete: "cascade" }),
+    eventId: text("event_id").references(() => events.id, { onDelete: "cascade" }),
+    interactionType: text("interaction_type").$type<"booth_visit" | "cv_viewed" | "contact_info_accessed" | "interview_scheduled" | "note_added" | "shortlisted">().notNull(),
+    duration: integer("duration"), // in minutes for booth visits
+    notes: text("notes"),
+    rating: integer("rating"), // 1-5 scale
+    metadata: json("metadata"), // Additional data like specific booth, time spent, etc.
+    performedBy: text("performed_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    employerIdx: index("candidate_interaction_employer_idx").on(table.employerId),
+    jobSeekerIdx: index("candidate_interaction_job_seeker_idx").on(table.jobSeekerId),
+    eventIdx: index("candidate_interaction_event_idx").on(table.eventId),
+    typeIdx: index("candidate_interaction_type_idx").on(table.interactionType),
+    performedByIdx: index("candidate_interaction_performed_by_idx").on(table.performedBy),
+    createdAtIdx: index("candidate_interaction_created_at_idx").on(table.createdAt),
+  })
+);
+
 // Notifications
 export const notifications = pgTable(
   "notification",
