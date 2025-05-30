@@ -94,7 +94,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-3xl mx-auto p-6 bg-white space-y-6">
       <Tabs defaultValue="pin" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 h-12">
           <TabsTrigger 
@@ -115,7 +115,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
         
         <TabsContent value="pin" className="mt-6 space-y-4">
           <div className="space-y-3">
-            <Label htmlFor="pin-input" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="pin-input" className="text-sm font-semibold text-gray-900">
               6-Digit PIN Code
             </Label>
             <div className="relative">
@@ -128,11 +128,11 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
                 placeholder="000000"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-                className="text-center text-2xl font-mono tracking-widest h-14 border-2 border-gray-300 focus:border-green-500 focus:ring-green-500 bg-gray-50 focus:bg-white"
+                className="text-center text-2xl font-mono tracking-widest h-14 border-2 border-gray-300 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white text-gray-900 placeholder:text-gray-400"
                 disabled={isVerifying}
               />
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-600 font-medium">
                   {pinInput.length}/6
                 </span>
               </div>
@@ -144,7 +144,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
           <Button 
             onClick={handlePinVerification}
             disabled={isVerifying || pinInput.length !== 6}
-            className="w-full h-12 text-base font-semibold bg-green-600 hover:bg-green-700 disabled:opacity-50"
+            className="w-full h-12 text-base font-semibold bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
             size="lg"
           >
             {isVerifying ? (
@@ -163,7 +163,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
 
         <TabsContent value="ticket" className="mt-6 space-y-4">
           <div className="space-y-3">
-            <Label htmlFor="ticket-input" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="ticket-input" className="text-sm font-semibold text-gray-900">
               Ticket Number
             </Label>
             <Input
@@ -172,7 +172,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
               placeholder="HCS-2024-12345678"
               value={ticketInput}
               onChange={(e) => setTicketInput(e.target.value.toUpperCase())}
-              className="h-12 text-base border-2 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-gray-50 focus:bg-white"
+              className="h-12 text-base border-2 border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-900 placeholder:text-gray-500"
               disabled={isVerifying}
             />
             <p className="text-xs text-gray-600">
@@ -182,7 +182,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
           <Button 
             onClick={handleTicketVerification}
             disabled={isVerifying || !ticketInput}
-            className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-200"
             size="lg"
           >
             {isVerifying ? (
@@ -203,17 +203,17 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
       {/* Verification Result */}
       {result && (
         <Alert 
-          className={`border-2 ${
+          className={`border-2 shadow-sm ${
             result.success 
               ? "border-green-300 bg-green-50" 
               : "border-red-300 bg-red-50"
-          } shadow-sm`}
+          }`}
         >
           <div className="flex items-start gap-3">
             {result.success ? (
-              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
             ) : (
-              <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+              <XCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
             )}
             <AlertDescription 
               className={`text-base font-medium ${
@@ -257,25 +257,25 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">PIN Code</p>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-gray-600 mb-1">PIN Code</p>
                     <p className="text-lg font-mono font-bold text-gray-900">{result.attendee.pin || 'N/A'}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Ticket Number</p>
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-gray-600 mb-1">Ticket Number</p>
                     <p className="text-base font-semibold text-gray-900">{result.attendee.ticketNumber || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-gray-500 mb-1">Registration Status</p>
-                    <Badge variant="outline" className="font-semibold text-gray-900">
+                  <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-gray-600 mb-1">Registration Status</p>
+                    <Badge variant="outline" className="font-semibold text-gray-900 border-gray-300">
                       {result.attendee.registrationStatus.toUpperCase()}
                     </Badge>
                   </div>
                   {result.attendee.checkInTime && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+                    <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                      <p className="text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
                         Check-in Time
                       </p>
