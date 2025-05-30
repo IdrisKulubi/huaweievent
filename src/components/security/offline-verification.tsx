@@ -189,7 +189,7 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
           </p>
         </div>
 
-        {/* Connection Status */}
+      {/* Connection Status */}
         <Card className={`transition-all duration-300 border-2 shadow-lg ${
           isOnline 
             ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 shadow-green-100" 
@@ -198,7 +198,7 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {isOnline ? (
+            {isOnline ? (
                   <div className="relative">
                     <Wifi className="h-6 w-6 text-green-600" />
                     <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -221,10 +221,10 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
               >
                 {isOnline ? "ONLINE" : "OFFLINE"}
               </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {isOnline ? (
                   <div className="flex items-center gap-2 text-green-700">
@@ -238,25 +238,25 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                   </div>
                 )}
               </div>
-              {!isOnline && (
+            {!isOnline && (
                 <p className="text-sm text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
                   Verifications stored locally • Will sync when online
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Verification Interface */}
+      {/* Verification Interface */}
         <Card className="border-2 border-blue-200 shadow-xl bg-white">
           <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
             <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
               <Shield className="h-7 w-7 text-blue-600" />
               Verification Interface
             </CardTitle>
-          </CardHeader>
+        </CardHeader>
           <CardContent className="p-8">
-            <Tabs defaultValue="pin" className="w-full">
+          <Tabs defaultValue="pin" className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 h-14 rounded-xl">
                 <TabsTrigger 
                   value="pin"
@@ -272,8 +272,8 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                   <Shield className="h-5 w-5" />
                   Ticket Number
                 </TabsTrigger>
-              </TabsList>
-              
+            </TabsList>
+            
               <TabsContent value="pin" className="mt-8 space-y-6">
                 <div className="space-y-4">
                   <Label htmlFor="pin-input" className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -281,15 +281,15 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                     6-Digit PIN Code
                   </Label>
                   <div className="relative">
-                    <Input
-                      id="pin-input"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
+                <Input
+                  id="pin-input"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
                       placeholder="000000"
-                      value={pinInput}
-                      onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
                       className="text-center text-3xl font-mono tracking-[0.5em] h-16 border-3 border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 bg-white text-gray-900 placeholder:text-gray-400 rounded-xl shadow-sm transition-all duration-200"
                     />
                     <div className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-100 rounded-lg px-3 py-1">
@@ -301,17 +301,17 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                   <p className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
                     💡 Enter the 6-digit PIN provided to the attendee
                   </p>
-                </div>
-                <Button 
-                  onClick={handlePinVerification}
-                  disabled={pinInput.length !== 6}
+              </div>
+              <Button 
+                onClick={handlePinVerification}
+                disabled={pinInput.length !== 6}
                   className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
                   size="lg"
-                >
+              >
                   <CheckCircle className="h-6 w-6 mr-3" />
                   Verify PIN Code
-                </Button>
-              </TabsContent>
+              </Button>
+            </TabsContent>
 
               <TabsContent value="ticket" className="mt-8 space-y-6">
                 <div className="space-y-4">
@@ -319,63 +319,63 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                     <Shield className="h-5 w-5 text-purple-600" />
                     Ticket Number
                   </Label>
-                  <Input
-                    id="ticket-input"
-                    type="text"
+                <Input
+                  id="ticket-input"
+                  type="text"
                     placeholder="HCS-2024-12345678"
-                    value={ticketInput}
-                    onChange={(e) => setTicketInput(e.target.value.toUpperCase())}
+                  value={ticketInput}
+                  onChange={(e) => setTicketInput(e.target.value.toUpperCase())}
                     className="h-14 text-lg border-3 border-gray-300 hover:border-purple-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white text-gray-900 placeholder:text-gray-500 rounded-xl shadow-sm transition-all duration-200"
-                  />
+                />
                   <p className="text-sm text-gray-600 bg-purple-50 p-3 rounded-lg border border-purple-200">
                     🎫 Enter the full ticket number in format: HCS-YYYY-XXXXXXXX
                   </p>
-                </div>
-                <Button 
-                  onClick={handleTicketVerification}
-                  disabled={!ticketInput}
+              </div>
+              <Button 
+                onClick={handleTicketVerification}
+                disabled={!ticketInput}
                   className="w-full h-14 text-lg font-bold bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
                   size="lg"
-                >
+              >
                   <Shield className="h-6 w-6 mr-3" />
-                  Verify Ticket
-                </Button>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                Verify Ticket
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
 
-        {/* Result Message */}
-        {result && (
+      {/* Result Message */}
+      {result && (
           <Alert className={`border-2 shadow-lg rounded-xl ${
             result.success 
               ? "border-green-300 bg-gradient-to-r from-green-50 to-emerald-50" 
               : "border-red-300 bg-gradient-to-r from-red-50 to-pink-50"
           }`}>
             <div className="flex items-center gap-4">
-              {result.success ? (
+            {result.success ? (
                 <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-              ) : (
+            ) : (
                 <XCircle className="h-6 w-6 text-red-600 flex-shrink-0" />
-              )}
+            )}
               <AlertDescription className={`text-lg font-medium ${
                 result.success ? "text-green-900" : "text-red-900"
               }`}>
-                {result.message}
-              </AlertDescription>
-            </div>
-          </Alert>
-        )}
+              {result.message}
+            </AlertDescription>
+          </div>
+        </Alert>
+      )}
 
-        {/* Offline Records */}
-        {offlineRecords.length > 0 && (
+      {/* Offline Records */}
+      {offlineRecords.length > 0 && (
           <Card className="border-2 border-amber-200 shadow-xl bg-gradient-to-r from-amber-50 to-yellow-50">
             <CardHeader className="bg-gradient-to-r from-amber-100 to-yellow-100 border-b border-amber-200">
               <CardTitle className="flex items-center gap-3 text-xl font-bold text-gray-900">
                 <Clock className="h-6 w-6 text-amber-600" />
-                Offline Records ({offlineRecords.length})
-              </CardTitle>
-            </CardHeader>
+              Offline Records ({offlineRecords.length})
+            </CardTitle>
+          </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-6">
                 <div className="space-y-3">
@@ -391,7 +391,7 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                             <Shield className="h-5 w-5 text-purple-600" />
                           )}
                         </div>
-                        <div>
+                    <div>
                           <p className="font-bold text-gray-900 text-lg">
                             {record.method === "pin" ? "PIN" : "Ticket"}: 
                             <span className="font-mono ml-2 bg-gray-100 px-2 py-1 rounded">
@@ -400,47 +400,47 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                           </p>
                           <p className="text-sm text-gray-600 font-medium">
                             📅 {new Date(record.timestamp).toLocaleString()}
-                          </p>
-                        </div>
+                      </p>
+                    </div>
                       </div>
                       <Badge className="bg-yellow-100 text-yellow-800 border-2 border-yellow-300 px-3 py-1 font-bold">
                         ⏳ Pending Sync
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
+                    </Badge>
+                  </div>
+                ))}
+              </div>
 
                 <div className="flex gap-4 pt-4 border-t border-amber-200">
-                  <Button 
-                    variant="outline" 
-                    onClick={exportOfflineData}
+                <Button 
+                  variant="outline" 
+                  onClick={exportOfflineData}
                     className="flex items-center gap-2 h-12 px-6 font-semibold border-2 border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl transition-all duration-200"
-                  >
+                >
                     <Download className="h-5 w-5" />
-                    Export Data
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={clearOfflineRecords}
+                  Export Data
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={clearOfflineRecords}
                     className="flex items-center gap-2 h-12 px-6 font-semibold border-2 border-red-300 text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200"
-                  >
+                >
                     <XCircle className="h-5 w-5" />
-                    Clear Records
-                  </Button>
-                </div>
+                  Clear Records
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Instructions */}
+      {/* Instructions */}
         <Card className="border-2 border-indigo-200 shadow-xl bg-gradient-to-r from-indigo-50 to-blue-50">
           <CardHeader className="bg-gradient-to-r from-indigo-100 to-blue-100 border-b border-indigo-200">
             <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
               <Database className="h-6 w-6 text-indigo-600" />
               Offline Mode Instructions
             </CardTitle>
-          </CardHeader>
+        </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
@@ -479,9 +479,9 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                   </p>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
       </div>
     </div>
   );

@@ -48,6 +48,7 @@ export const jobSeekers = pgTable(
     cvUrl: text("cv_url"),
     skills: json("skills").$type<string[]>(),
     experience: text("experience"),
+    location: text("location"),
     education: text("education"),
     pin: text("pin").unique(), // 6-digit PIN for verification
     ticketNumber: text("ticket_number").unique(),
