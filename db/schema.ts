@@ -48,7 +48,6 @@ export const jobSeekers = pgTable(
     cvUrl: text("cv_url"),
     skills: json("skills").$type<string[]>(),
     experience: text("experience"),
-    location: text("location"),
     education: text("education"),
     pin: text("pin").unique(), // 6-digit PIN for verification
     ticketNumber: text("ticket_number").unique(),
@@ -60,6 +59,9 @@ export const jobSeekers = pgTable(
     availableFrom: timestamp("available_from"),
     pinGeneratedAt: timestamp("pin_generated_at"), // Track when PIN was generated
     pinExpiresAt: timestamp("pin_expires_at"), // PIN expiration time
+    // New fields for assignment tracking
+    assignmentStatus: text("assignment_status").$type<"unassigned" | "assigned" | "confirmed" | "completed">().default("unassigned"),
+    priorityLevel: text("priority_level").$type<"low" | "normal" | "high">().default("normal"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -68,6 +70,7 @@ export const jobSeekers = pgTable(
     pinIdx: index("job_seeker_pin_idx").on(table.pin),
     ticketNumberIdx: index("job_seeker_ticket_number_idx").on(table.ticketNumber),
     statusIdx: index("job_seeker_status_idx").on(table.registrationStatus),
+    assignmentStatusIdx: index("job_seeker_assignment_status_idx").on(table.assignmentStatus),
   })
 );
 
@@ -518,5 +521,95 @@ export const verificationTokens = pgTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  })
+);
+
+// Booth Assignments - New table for manual booth assignments
+export const boothAssignments = pgTable(
+  "booth_assignment",
+  {
+    id: text("id").primaryKey(),
+    jobSeekerId: text("job_seeker_id").notNull().references(() => jobSeekers.id, { onDelete: "cascade" }),
+    boothId: text("booth_id").notNull().references(() => booths.id, { onDelete: "cascade" }),
+    interviewSlotId: text("interview_slot_id").references(() => interviewSlots.id, { onDelete: "set null" }),
+    assignedBy: text("assigned_by").notNull().references(() => users.id, { onDelete: "cascade" }), // Admin who made assignment
+    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+    status: text("status").$type<"assigned" | "confirmed" | "completed" | "cancelled" | "no_show">().default("assigned"),
+    interviewDate: timestamp("interview_date"),
+    interviewTime: text("interview_time"), // e.g., "10:00 AM - 10:30 AM"
+    notes: text("notes"),
+    priority: text("priority").$type<"high" | "medium" | "low">().default("medium"),
+    notificationSent: boolean("notification_sent").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    jobSeekerIdx: index("booth_assignment_job_seeker_idx").on(table.jobSeekerId),
+    boothIdx: index("booth_assignment_booth_idx").on(table.boothId),
+    assignedByIdx: index("booth_assignment_assigned_by_idx").on(table.assignedBy),
+    statusIdx: index("booth_assignment_status_idx").on(table.status),
+    dateIdx: index("booth_assignment_date_idx").on(table.interviewDate),
+  })
+);
+
+// Bulk Notifications - New table for managing bulk email/SMS campaigns
+export const bulkNotifications = pgTable(
+  "bulk_notification",
+  {
+    id: text("id").primaryKey(),
+    campaignName: text("campaign_name").notNull(),
+    notificationType: text("notification_type").$type<"email" | "sms" | "both">().notNull(),
+    templateType: text("template_type").notNull(), // e.g., "booth_assignment", "event_reminder"
+    subject: text("subject"), // For emails
+    message: text("message").notNull(),
+    recipientCount: integer("recipient_count").notNull(),
+    sentCount: integer("sent_count").default(0),
+    failedCount: integer("failed_count").default(0),
+    status: text("status").$type<"draft" | "pending" | "sending" | "completed" | "failed" | "cancelled">().default("draft"),
+    scheduledAt: timestamp("scheduled_at"),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdBy: text("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+    metadata: json("metadata"), // Additional campaign data
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    createdByIdx: index("bulk_notification_created_by_idx").on(table.createdBy),
+    statusIdx: index("bulk_notification_status_idx").on(table.status),
+    typeIdx: index("bulk_notification_type_idx").on(table.notificationType),
+    scheduledIdx: index("bulk_notification_scheduled_idx").on(table.scheduledAt),
+  })
+);
+
+// Notification Recipients - Track individual notification delivery status
+export const notificationRecipients = pgTable(
+  "notification_recipient",
+  {
+    id: text("id").primaryKey(),
+    bulkNotificationId: text("bulk_notification_id").notNull().references(() => bulkNotifications.id, { onDelete: "cascade" }),
+    jobSeekerId: text("job_seeker_id").notNull().references(() => jobSeekers.id, { onDelete: "cascade" }),
+    boothAssignmentId: text("booth_assignment_id").references(() => boothAssignments.id, { onDelete: "set null" }),
+    emailStatus: text("email_status").$type<"pending" | "sent" | "delivered" | "failed" | "bounced">().default("pending"),
+    smsStatus: text("sms_status").$type<"pending" | "sent" | "delivered" | "failed">().default("pending"),
+    emailSentAt: timestamp("email_sent_at"),
+    smsSentAt: timestamp("sms_sent_at"),
+    emailDeliveredAt: timestamp("email_delivered_at"),
+    smsDeliveredAt: timestamp("sms_delivered_at"),
+    emailError: text("email_error"),
+    smsError: text("sms_error"),
+    emailMessageId: text("email_message_id"), // External service message ID
+    smsMessageId: text("sms_message_id"), // External service message ID
+    opened: boolean("opened").default(false), // Email opened
+    clicked: boolean("clicked").default(false), // Email link clicked
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    bulkNotificationIdx: index("notification_recipient_bulk_idx").on(table.bulkNotificationId),
+    jobSeekerIdx: index("notification_recipient_job_seeker_idx").on(table.jobSeekerId),
+    boothAssignmentIdx: index("notification_recipient_booth_assignment_idx").on(table.boothAssignmentId),
+    emailStatusIdx: index("notification_recipient_email_status_idx").on(table.emailStatus),
+    smsStatusIdx: index("notification_recipient_sms_status_idx").on(table.smsStatus),
   })
 );

@@ -44,6 +44,20 @@ CREATE TABLE "booth" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "candidate_interaction" (
+	"id" text PRIMARY KEY NOT NULL,
+	"employer_id" text NOT NULL,
+	"job_seeker_id" text NOT NULL,
+	"event_id" text,
+	"interaction_type" text NOT NULL,
+	"duration" integer,
+	"notes" text,
+	"rating" integer,
+	"metadata" json,
+	"performed_by" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "checkpoint" (
 	"id" text PRIMARY KEY NOT NULL,
 	"event_id" text NOT NULL,
@@ -130,6 +144,22 @@ CREATE TABLE "interview_slot" (
 	"is_booked" boolean DEFAULT false,
 	"interviewer_name" text,
 	"notes" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "job_application" (
+	"id" text PRIMARY KEY NOT NULL,
+	"job_id" text NOT NULL,
+	"job_seeker_id" text NOT NULL,
+	"status" text DEFAULT 'applied',
+	"cover_letter" text,
+	"resume_url" text,
+	"applied_at" timestamp DEFAULT now() NOT NULL,
+	"reviewed_at" timestamp,
+	"reviewed_by" text,
+	"notes" text,
+	"rating" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -229,6 +259,22 @@ CREATE TABLE "session" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "shortlist" (
+	"id" text PRIMARY KEY NOT NULL,
+	"employer_id" text NOT NULL,
+	"job_id" text,
+	"event_id" text,
+	"job_seeker_id" text NOT NULL,
+	"list_name" text DEFAULT 'Main Shortlist' NOT NULL,
+	"status" text DEFAULT 'interested',
+	"priority" text DEFAULT 'medium',
+	"notes" text,
+	"tags" json,
+	"added_by" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "system_log" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text,
@@ -275,6 +321,10 @@ ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_checkpoint_id_
 ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_verified_by_security_personnel_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."security_personnel"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "booth" ADD CONSTRAINT "booth_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "booth" ADD CONSTRAINT "booth_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_performed_by_user_id_fk" FOREIGN KEY ("performed_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "checkpoint" ADD CONSTRAINT "checkpoint_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "employer" ADD CONSTRAINT "employer_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "event" ADD CONSTRAINT "event_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -286,6 +336,9 @@ ALTER TABLE "interview_booking" ADD CONSTRAINT "interview_booking_job_seeker_id_
 ALTER TABLE "interview_booking" ADD CONSTRAINT "interview_booking_interview_slot_id_interview_slot_id_fk" FOREIGN KEY ("interview_slot_id") REFERENCES "public"."interview_slot"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "interview_slot" ADD CONSTRAINT "interview_slot_booth_id_booth_id_fk" FOREIGN KEY ("booth_id") REFERENCES "public"."booth"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "interview_slot" ADD CONSTRAINT "interview_slot_job_id_job_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."job"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "job_application" ADD CONSTRAINT "job_application_job_id_job_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."job"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "job_application" ADD CONSTRAINT "job_application_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "job_application" ADD CONSTRAINT "job_application_reviewed_by_user_id_fk" FOREIGN KEY ("reviewed_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "job_seeker" ADD CONSTRAINT "job_seeker_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "job" ADD CONSTRAINT "job_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "job" ADD CONSTRAINT "job_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -295,6 +348,11 @@ ALTER TABLE "security_incident" ADD CONSTRAINT "security_incident_reported_by_se
 ALTER TABLE "security_incident" ADD CONSTRAINT "security_incident_resolved_by_user_id_fk" FOREIGN KEY ("resolved_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "security_personnel" ADD CONSTRAINT "security_personnel_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shortlist" ADD CONSTRAINT "shortlist_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shortlist" ADD CONSTRAINT "shortlist_job_id_job_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."job"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shortlist" ADD CONSTRAINT "shortlist_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shortlist" ADD CONSTRAINT "shortlist_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "shortlist" ADD CONSTRAINT "shortlist_added_by_user_id_fk" FOREIGN KEY ("added_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "system_log" ADD CONSTRAINT "system_log_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "attendance_job_seeker_idx" ON "attendance_record" USING btree ("job_seeker_id");--> statement-breakpoint
 CREATE INDEX "attendance_event_idx" ON "attendance_record" USING btree ("event_id");--> statement-breakpoint
@@ -304,6 +362,12 @@ CREATE INDEX "attendance_verified_by_idx" ON "attendance_record" USING btree ("v
 CREATE INDEX "booth_event_idx" ON "booth" USING btree ("event_id");--> statement-breakpoint
 CREATE INDEX "booth_employer_idx" ON "booth" USING btree ("employer_id");--> statement-breakpoint
 CREATE INDEX "booth_number_idx" ON "booth" USING btree ("booth_number");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_employer_idx" ON "candidate_interaction" USING btree ("employer_id");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_job_seeker_idx" ON "candidate_interaction" USING btree ("job_seeker_id");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_event_idx" ON "candidate_interaction" USING btree ("event_id");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_type_idx" ON "candidate_interaction" USING btree ("interaction_type");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_performed_by_idx" ON "candidate_interaction" USING btree ("performed_by");--> statement-breakpoint
+CREATE INDEX "candidate_interaction_created_at_idx" ON "candidate_interaction" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "checkpoint_event_idx" ON "checkpoint" USING btree ("event_id");--> statement-breakpoint
 CREATE INDEX "checkpoint_type_idx" ON "checkpoint" USING btree ("checkpoint_type");--> statement-breakpoint
 CREATE INDEX "checkpoint_active_idx" ON "checkpoint" USING btree ("is_active");--> statement-breakpoint
@@ -323,6 +387,11 @@ CREATE INDEX "interview_booking_status_idx" ON "interview_booking" USING btree (
 CREATE INDEX "interview_slot_booth_idx" ON "interview_slot" USING btree ("booth_id");--> statement-breakpoint
 CREATE INDEX "interview_slot_time_idx" ON "interview_slot" USING btree ("start_time");--> statement-breakpoint
 CREATE INDEX "interview_slot_booked_idx" ON "interview_slot" USING btree ("is_booked");--> statement-breakpoint
+CREATE INDEX "job_application_job_idx" ON "job_application" USING btree ("job_id");--> statement-breakpoint
+CREATE INDEX "job_application_job_seeker_idx" ON "job_application" USING btree ("job_seeker_id");--> statement-breakpoint
+CREATE INDEX "job_application_status_idx" ON "job_application" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "job_application_applied_at_idx" ON "job_application" USING btree ("applied_at");--> statement-breakpoint
+CREATE INDEX "job_application_reviewed_by_idx" ON "job_application" USING btree ("reviewed_by");--> statement-breakpoint
 CREATE INDEX "job_seeker_user_id_idx" ON "job_seeker" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "job_seeker_pin_idx" ON "job_seeker" USING btree ("pin");--> statement-breakpoint
 CREATE INDEX "job_seeker_ticket_number_idx" ON "job_seeker" USING btree ("ticket_number");--> statement-breakpoint
@@ -343,6 +412,12 @@ CREATE INDEX "incident_created_at_idx" ON "security_incident" USING btree ("crea
 CREATE INDEX "security_user_id_idx" ON "security_personnel" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "security_badge_idx" ON "security_personnel" USING btree ("badge_number");--> statement-breakpoint
 CREATE INDEX "security_duty_idx" ON "security_personnel" USING btree ("is_on_duty");--> statement-breakpoint
+CREATE INDEX "shortlist_employer_idx" ON "shortlist" USING btree ("employer_id");--> statement-breakpoint
+CREATE INDEX "shortlist_job_idx" ON "shortlist" USING btree ("job_id");--> statement-breakpoint
+CREATE INDEX "shortlist_job_seeker_idx" ON "shortlist" USING btree ("job_seeker_id");--> statement-breakpoint
+CREATE INDEX "shortlist_status_idx" ON "shortlist" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "shortlist_priority_idx" ON "shortlist" USING btree ("priority");--> statement-breakpoint
+CREATE INDEX "shortlist_added_by_idx" ON "shortlist" USING btree ("added_by");--> statement-breakpoint
 CREATE INDEX "system_log_user_idx" ON "system_log" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "system_log_action_idx" ON "system_log" USING btree ("action");--> statement-breakpoint
 CREATE INDEX "system_log_resource_idx" ON "system_log" USING btree ("resource");--> statement-breakpoint

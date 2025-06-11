@@ -1,10 +1,10 @@
 "use server";
-
 import db from "@/db/drizzle";
 import { users, jobSeekers } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { generateSecurePin, generateTicketNumber } from "@/lib/utils/security";
-import { sendWelcomeEmail, sendWelcomeSMS } from "@/lib/utils/notifications";
+import { sendWelcomeEmail } from "@/lib/utils/notifications";
+import { sendWelcomeSMS as sendTwilioWelcomeSMS } from "@/lib/actions/send-sms-actions";
 import { auth } from "@/lib/auth";
 
 interface CreateJobSeekerProfileData {
@@ -15,7 +15,6 @@ interface CreateJobSeekerProfileData {
   jobSectors: string[];
   educationLevel: string;
   experienceLevel: string;
-  timePreference: string;
   skills: string[];
   linkedinUrl?: string;
   portfolioUrl?: string;
@@ -27,6 +26,26 @@ interface CreateJobSeekerProfileData {
 
 export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
   try {
+    // Debug: Log the incoming data to see what we're receiving
+    console.log("🔍 CreateJobSeekerProfile received data:", {
+      userId: data.userId,
+      fullName: data.fullName,
+      skills: data.skills,
+      expectedSalary: data.expectedSalary,
+      skillsType: typeof data.skills,
+      expectedSalaryType: typeof data.expectedSalary,
+    });
+
+    // Debug: Log the incoming data to see what we're receiving
+    console.log("🔍 CreateJobSeekerProfile received data:", {
+      userId: data.userId,
+      fullName: data.fullName,
+      skills: data.skills,
+      expectedSalary: data.expectedSalary,
+      skillsType: typeof data.skills,
+      expectedSalaryType: typeof data.expectedSalary,
+    });
+
     const session = await auth();
     if (!session?.user?.id) {
       throw new Error("Unauthorized");
@@ -61,6 +80,16 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
         })
         .where(eq(users.id, data.userId));
 
+      // Validate and process expectedSalary
+      let processedExpectedSalary = null;
+      if (data.expectedSalary && data.expectedSalary.trim()) {
+        // Try to extract numeric value from salary string
+        const salaryMatch = data.expectedSalary.replace(/[^\d.-]/g, '');
+        if (salaryMatch && !isNaN(parseFloat(salaryMatch))) {
+          processedExpectedSalary = salaryMatch;
+        }
+      }
+
       // Create job seeker profile
       await tx
         .insert(jobSeekers)
@@ -78,7 +107,7 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
           interestCategories: data.interestCategories,
           linkedinUrl: data.linkedinUrl || null,
           portfolioUrl: data.portfolioUrl || null,
-          expectedSalary: data.expectedSalary || null,
+          expectedSalary: processedExpectedSalary,
           availableFrom: new Date(data.availableFrom),
           pinGeneratedAt: new Date(),
           pinExpiresAt: pinExpirationTime,
@@ -98,18 +127,36 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
         ticketNumber: ticketNumber,
         eventDetails: {
           name: "Huawei Career Summit",
-          date: "December 15-16, 2024",
+          date: "May 15-16, 2025",
           venue: "KICC, Nairobi",
         }
       });
 
-      // Send welcome SMS with PIN
-      await sendWelcomeSMS({
-        phoneNumber: data.phoneNumber,
-        name: data.fullName,
-        pin: pin,
-        ticketNumber: ticketNumber,
-      });
+      // Send welcome SMS with PIN using Twilio
+      const jobSeekerProfile = await db
+        .select()
+        .from(jobSeekers)
+        .where(eq(jobSeekers.userId, data.userId))
+        .limit(1);
+
+      if (jobSeekerProfile.length > 0 && user.phoneNumber) {
+        try {
+          console.log(`📱 Sending welcome SMS to job seeker: ${jobSeekerProfile[0].id}`);
+          const smsResult = await sendTwilioWelcomeSMS(jobSeekerProfile[0].id);
+          
+          if (smsResult.success) {
+            console.log(`✅ Welcome SMS sent successfully: ${smsResult.messageId}`);
+          } else {
+            console.error("❌ Failed to send welcome SMS:", smsResult.error);
+            // Continue without failing the registration
+          }
+        } catch (error: any) {
+          console.error("❌ Error sending welcome SMS:", error);
+          // Continue without failing the registration
+        }
+      } else {
+        console.warn("⚠️ Cannot send SMS: Job seeker profile not found or phone number missing");
+      }
     }
 
     return {
@@ -123,6 +170,7 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
 
   } catch (error) {
     console.error("Error creating job seeker profile:", error);
+    console.log(error);
     throw new Error("Failed to create profile. Please try again.");
   }
 }
@@ -203,7 +251,17 @@ export async function updateUserProfile(userId: string, updates: Partial<CreateJ
       if (updates.interestCategories) jobSeekerUpdates.interestCategories = updates.interestCategories;
       if (updates.linkedinUrl !== undefined) jobSeekerUpdates.linkedinUrl = updates.linkedinUrl || null;
       if (updates.portfolioUrl !== undefined) jobSeekerUpdates.portfolioUrl = updates.portfolioUrl || null;
-      if (updates.expectedSalary !== undefined) jobSeekerUpdates.expectedSalary = updates.expectedSalary || null;
+      if (updates.expectedSalary !== undefined) {
+        let processedExpectedSalary = null;
+        if (updates.expectedSalary && updates.expectedSalary.trim()) {
+          // Try to extract numeric value from salary string
+          const salaryMatch = updates.expectedSalary.replace(/[^\d.-]/g, '');
+          if (salaryMatch && !isNaN(parseFloat(salaryMatch))) {
+            processedExpectedSalary = salaryMatch;
+          }
+        }
+        jobSeekerUpdates.expectedSalary = processedExpectedSalary;
+      }
       if (updates.availableFrom) jobSeekerUpdates.availableFrom = new Date(updates.availableFrom);
 
       if (Object.keys(jobSeekerUpdates).length > 0) {
@@ -250,7 +308,7 @@ export async function regeneratePin(userId: string) {
     // Get user details for notifications
     const userProfile = await getUserProfile(userId);
     if (userProfile) {
-      // Send new PIN via email and SMS
+      // Send new PIN via email
       await sendWelcomeEmail({
         email: userProfile.email,
         name: userProfile.name || "Job Seeker",
@@ -263,13 +321,23 @@ export async function regeneratePin(userId: string) {
         }
       });
 
-      if (userProfile.phoneNumber) {
-        await sendWelcomeSMS({
-          phoneNumber: userProfile.phoneNumber,
-          name: userProfile.name || "Job Seeker",
-          pin: newPin,
-          ticketNumber: userProfile.jobSeeker?.ticketNumber || "",
-        });
+      // Send new PIN via SMS using Twilio
+      if (userProfile.phoneNumber && userProfile.jobSeeker?.id) {
+        try {
+          console.log(`📱 Sending PIN reminder SMS to job seeker: ${userProfile.jobSeeker.id}`);
+          
+          // Use PIN reminder SMS function instead
+          const { sendPinReminderSMS } = await import("@/lib/actions/send-sms-actions");
+          const smsResult = await sendPinReminderSMS(userProfile.jobSeeker.id);
+          
+          if (smsResult.success) {
+            console.log(`✅ PIN reminder SMS sent successfully: ${smsResult.messageId}`);
+          } else {
+            console.error("❌ Failed to send PIN reminder SMS:", smsResult.error);
+          }
+        } catch (error: any) {
+          console.error("❌ Error sending PIN reminder SMS:", error);
+        }
       }
     }
 

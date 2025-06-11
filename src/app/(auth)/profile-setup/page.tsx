@@ -2,6 +2,7 @@ import { ProfileSetupForm } from "@/components/profile/profile-setup-form";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getUserProfile } from "@/lib/actions/user-actions";
+import Image from "next/image";
 
 export default async function ProfileSetupPage() {
   const session = await auth();
@@ -24,10 +25,12 @@ export default async function ProfileSetupPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <img
+              <Image
                 src="/huaweilogo.png"
                 alt="Huawei"
                 className="h-10 object-contain"
+                width={100}
+                height={100}
               />
               <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
               <img

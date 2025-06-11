@@ -1,8 +1,15 @@
 /**
  * Notification utilities for sending emails and SMS
- * This is a placeholder implementation - you'll need to integrate with actual services
- * like Resend for emails and Twilio/Africa's Talking for SMS
+ * 
+ * This module handles all external communications including:
+ * - Welcome emails and SMS for new registrations
+ * - PIN reminders via email and SMS
+ * - Event notifications and updates
+ * 
+ * Uses Resend for emails and Twilio for SMS
  */
+
+import { sendSMS } from '@/lib/actions/send-sms-actions';
 
 interface WelcomeEmailData {
   email: string;
@@ -97,41 +104,34 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
  */
 export async function sendWelcomeSMS(data: WelcomeSMSData): Promise<boolean> {
   try {
-    // TODO: Implement with your preferred SMS service (Africa's Talking, Twilio, etc.)
-    
-    const smsContent = `
-Hello ${data.name}! Welcome to Huawei Career Summit 2024.
+    const smsContent = `🎉 Welcome ${data.name}! You're registered for Huawei Career Summit 2024.
 
-Your details:
 🎫 Ticket: ${data.ticketNumber}
 🔐 PIN: ${data.pin}
 
-Save this PIN for check-in at KICC on Dec 15-16, 2024.
+📅 Dec 15-16, 2024 at KICC, Nairobi
+Keep this PIN safe for check-in!
 
-Support: +254 700 000 000
-`.trim();
+Support: +254 700 000 000 🚀`;
 
-    // Placeholder implementation - replace with actual SMS service
-    console.log("Sending welcome SMS to:", data.phoneNumber);
-    console.log("SMS content:", smsContent);
-
-    // Example with Africa's Talking (uncomment when you have credentials):
-    /*
-    const AfricasTalking = require('africastalking')({
-      apiKey: process.env.AFRICAS_TALKING_API_KEY,
-      username: process.env.AFRICAS_TALKING_USERNAME,
-    });
-
-    const sms = AfricasTalking.SMS;
-    
-    await sms.send({
-      to: [data.phoneNumber],
+    const result = await sendSMS({
+      phoneNumber: data.phoneNumber,
       message: smsContent,
-      from: process.env.AFRICAS_TALKING_SHORTCODE,
+      templateType: 'WELCOME',
+      metadata: {
+        ticketNumber: data.ticketNumber,
+        pin: data.pin
+      }
     });
-    */
 
+    if (!result.success) {
+      console.error("SMS sending failed:", result.error);
+      return false;
+    }
+
+    console.log(`📱 Welcome SMS sent successfully to ${data.phoneNumber}: ${result.messageId}`);
     return true;
+
   } catch (error) {
     console.error("Error sending welcome SMS:", error);
     return false;
@@ -177,19 +177,32 @@ export async function sendPinReminderEmail(email: string, name: string, pin: str
  */
 export async function sendPinReminderSMS(phoneNumber: string, name: string, pin: string, ticketNumber: string): Promise<boolean> {
   try {
-    const smsContent = `
-Hi ${name}! Reminder for Huawei Career Summit 2024:
+    const smsContent = `Hi ${name}! 📱 Reminder for Huawei Career Summit 2024:
 
 🎫 Ticket: ${ticketNumber}
 🔐 PIN: ${pin}
 
-Dec 15-16 at KICC, Nairobi. Keep this safe!
-`.trim();
+📅 Dec 15-16 at KICC, Nairobi
+Keep this safe for check-in! 🎯`;
 
-    console.log("Sending PIN reminder SMS to:", phoneNumber);
-    console.log("SMS content:", smsContent);
+    const result = await sendSMS({
+      phoneNumber: phoneNumber,
+      message: smsContent,
+      templateType: 'PIN_REMINDER',
+      metadata: {
+        ticketNumber,
+        pin
+      }
+    });
 
+    if (!result.success) {
+      console.error("PIN reminder SMS sending failed:", result.error);
+      return false;
+    }
+
+    console.log(`📱 PIN reminder SMS sent successfully to ${phoneNumber}: ${result.messageId}`);
     return true;
+
   } catch (error) {
     console.error("Error sending PIN reminder SMS:", error);
     return false;

@@ -62,13 +62,6 @@ const EXPERIENCE_LEVELS = [
   "10+ years"
 ];
 
-const TIME_PREFERENCES = [
-  "Morning (9:00 AM - 12:00 PM)",
-  "Afternoon (12:00 PM - 3:00 PM)",
-  "Late Afternoon (3:00 PM - 6:00 PM)",
-  "No preference"
-];
-
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
@@ -76,7 +69,6 @@ const profileSchema = z.object({
   jobSectors: z.array(z.string()).min(1, "Please select at least one job sector"),
   educationLevel: z.string().min(1, "Please select your education level"),
   experienceLevel: z.string().min(1, "Please select your experience level"),
-  timePreference: z.string().min(1, "Please select your preferred interview time"),
   skills: z.string().min(10, "Please enter your key skills"),
   linkedinUrl: z.string().url("Please enter a valid LinkedIn URL").optional().or(z.literal("")),
   portfolioUrl: z.string().url("Please enter a valid portfolio URL").optional().or(z.literal("")),
@@ -101,7 +93,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [cvUploadUrl, setCvUploadUrl] = useState<string>("");
 
-  const totalSteps = 4;
+  const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
   const {
@@ -140,10 +132,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
         fieldsToValidate = ["bio", "jobSectors"];
         break;
       case 3:
-        fieldsToValidate = ["educationLevel", "experienceLevel", "skills"];
-        break;
-      case 4:
-        fieldsToValidate = ["timePreference", "availableFrom"];
+        fieldsToValidate = ["educationLevel", "experienceLevel", "skills", "availableFrom"];
         break;
     }
     
@@ -176,11 +165,21 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
         cvUrl: cvUploadUrl,
         skills: skillsArray,
         interestCategories: data.jobSectors,
+        // Ensure expectedSalary is properly set
+        expectedSalary: data.expectedSalary?.trim() || undefined,
       };
+
+      // Debug: Log the data being sent
+      console.log("🔍 Frontend sending profile data:", {
+        skills: profileData.skills,
+        expectedSalary: profileData.expectedSalary,
+        skillsType: typeof profileData.skills,
+        expectedSalaryType: typeof profileData.expectedSalary,
+      });
 
       await createJobSeekerProfile(profileData);
       
-      toast.success("Profile created successfully! You'll receive your PIN shortly.");
+      toast.success("Registration completed! Our team will review your application and assign interview slots. You'll receive notifications with your booth assignment details.");
       
       // Redirect to dashboard or success page
       window.location.href = "/dashboard";
@@ -440,107 +439,91 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   currentFile={cvFile}
                 />
               </div>
-            </CardContent>
-          </Card>
-        );
 
-      case 4:
-        return (
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white via-orange-50/30 to-amber-50/40 dark:from-slate-800 dark:via-slate-700/50 dark:to-orange-900/20">
-            <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-3 text-slate-800 dark:text-slate-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Preferences & Availability</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Final details to complete your profile</p>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="timePreference" className="text-slate-700 dark:text-slate-300 font-medium">Preferred Interview Time *</Label>
-                  <Select onValueChange={(value) => setValue("timePreference", value)}>
-                    <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500/20">
-                      <SelectValue placeholder="Select your preferred time slot" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TIME_PREFERENCES.map((time) => (
-                        <SelectItem key={time} value={time} className="py-3">
-                          {time}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.timePreference && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.timePreference.message}
-                    </p>
-                  )}
+              {/* Availability and Optional Fields */}
+              <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-purple-600" />
+                  Availability & Additional Information
+                </h4>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="availableFrom" className="text-slate-700 dark:text-slate-300 font-medium">Available to Start *</Label>
+                    <Input
+                      id="availableFrom"
+                      type="date"
+                      {...register("availableFrom")}
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                    {errors.availableFrom && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.availableFrom.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="expectedSalary" className="text-slate-700 dark:text-slate-300 font-medium">Expected Salary (Optional)</Label>
+                    <Input
+                      id="expectedSalary"
+                      {...register("expectedSalary")}
+                      placeholder="e.g., KES 50,000 - 80,000"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="availableFrom" className="text-slate-700 dark:text-slate-300 font-medium">Available to Start *</Label>
-                  <Input
-                    id="availableFrom"
-                    type="date"
-                    {...register("availableFrom")}
-                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200"
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                  {errors.availableFrom && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.availableFrom.message}
-                    </p>
-                  )}
-                </div>
-              </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedinUrl" className="text-slate-700 dark:text-slate-300 font-medium">LinkedIn Profile (Optional)</Label>
+                    <Input
+                      id="linkedinUrl"
+                      {...register("linkedinUrl")}
+                      placeholder="https://linkedin.com/in/yourprofile"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                    />
+                    {errors.linkedinUrl && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.linkedinUrl.message}
+                      </p>
+                    )}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="expectedSalary" className="text-slate-700 dark:text-slate-300 font-medium">Expected Salary (Optional)</Label>
-                <Input
-                  id="expectedSalary"
-                  {...register("expectedSalary")}
-                  placeholder="e.g., KES 50,000 - 80,000"
-                  className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="linkedinUrl" className="text-slate-700 dark:text-slate-300 font-medium">LinkedIn Profile (Optional)</Label>
-                  <Input
-                    id="linkedinUrl"
-                    {...register("linkedinUrl")}
-                    placeholder="https://linkedin.com/in/yourprofile"
-                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200"
-                  />
-                  {errors.linkedinUrl && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.linkedinUrl.message}
-                    </p>
-                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="portfolioUrl" className="text-slate-700 dark:text-slate-300 font-medium">Portfolio URL (Optional)</Label>
+                    <Input
+                      id="portfolioUrl"
+                      {...register("portfolioUrl")}
+                      placeholder="https://yourportfolio.com"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                    />
+                    {errors.portfolioUrl && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.portfolioUrl.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="portfolioUrl" className="text-slate-700 dark:text-slate-300 font-medium">Portfolio URL (Optional)</Label>
-                  <Input
-                    id="portfolioUrl"
-                    {...register("portfolioUrl")}
-                    placeholder="https://yourportfolio.com"
-                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500/20 transition-all duration-200"
-                  />
-                  {errors.portfolioUrl && (
-                    <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.portfolioUrl.message}
-                    </p>
-                  )}
+                {/* Assignment Notice */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-xl border border-blue-200/50 dark:border-blue-800/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Interview Assignment Process</h5>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        After registration, our team will review all applications and manually assign interview slots based on your skills and company requirements. 
+                        You'll receive an email and SMS notification with your booth assignment and interview details.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -579,7 +562,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
 
         {/* Step Indicators */}
         <div className="flex justify-between items-center mt-4">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3].map((step) => (
             <div key={step} className="flex items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                 step <= currentStep 

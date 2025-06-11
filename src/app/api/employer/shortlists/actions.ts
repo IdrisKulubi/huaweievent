@@ -5,6 +5,7 @@ import db from "@/db/drizzle";
 import { shortlists, employers, jobSeekers, users, candidateInteractions } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { sendShortlistedSMS } from "@/lib/actions/send-sms-actions";
 
 export async function addToShortlist(formData: {
   jobSeekerId: string;
@@ -14,6 +15,7 @@ export async function addToShortlist(formData: {
   priority?: "high" | "medium" | "low";
   notes?: string;
   tags?: string[];
+  sendNotification?: boolean;
 }) {
   try {
     const session = await auth();
@@ -78,6 +80,26 @@ export async function addToShortlist(formData: {
       notes: formData.notes,
       performedBy: session.user.id,
     });
+
+    // Send SMS notification if requested (default: true)
+    if (formData.sendNotification !== false) {
+      try {
+        const smsResult = await sendShortlistedSMS(
+          formData.jobSeekerId,
+          employer.companyName
+        );
+        
+        if (!smsResult.success) {
+          console.warn("Failed to send shortlist SMS notification:", smsResult.error);
+          // Don't fail the shortlist operation if SMS fails
+        } else {
+          console.log(`📱 Shortlist SMS notification sent successfully: ${smsResult.messageId}`);
+        }
+      } catch (error: any) {
+        console.error("Error sending shortlist SMS:", error);
+        // Continue with shortlist creation even if SMS fails
+      }
+    }
 
     revalidatePath("/employer/shortlists");
     revalidatePath("/employer/candidates");
@@ -276,7 +298,13 @@ export async function getEmployerShortlists(listName?: string) {
 
     const employer = employerProfile[0];
 
-    let query = db
+    // Build where conditions
+    const whereConditions = [eq(shortlists.employerId, employer.id)];
+    if (listName) {
+      whereConditions.push(eq(shortlists.listName, listName));
+    }
+
+    const results = await db
       .select({
         shortlist: shortlists,
         jobSeeker: jobSeekers,
@@ -285,13 +313,8 @@ export async function getEmployerShortlists(listName?: string) {
       .from(shortlists)
       .leftJoin(jobSeekers, eq(jobSeekers.id, shortlists.jobSeekerId))
       .leftJoin(users, eq(users.id, jobSeekers.userId))
-      .where(eq(shortlists.employerId, employer.id));
-
-    if (listName) {
-      query = query.where(eq(shortlists.listName, listName));
-    }
-
-    const results = await query.orderBy(desc(shortlists.createdAt));
+      .where(whereConditions.length > 1 ? and(...whereConditions) : whereConditions[0])
+      .orderBy(desc(shortlists.createdAt));
     
     return results;
   } catch (error) {
