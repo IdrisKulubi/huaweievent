@@ -195,73 +195,41 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
     switch (currentStep) {
       case 1:
         return (
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/40 dark:from-slate-800 dark:via-slate-700/50 dark:to-blue-900/20">
-            <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-3 text-slate-800 dark:text-slate-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Personal Information</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Let's start with your basic details</p>
+          <Card className="border-t-4 border-t-green-500 shadow-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-lg">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-3">
+                  <User className="w-6 h-6 text-green-600" />
+                  <h3 className="text-xl font-semibold">Step 1: Your Profile</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Introduce yourself to employers</p>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300 font-medium">Full Name *</Label>
-                <div className="relative">
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Full Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300 font-medium">Full Name *</Label>
                   <Input
                     id="fullName"
                     {...register("fullName")}
-                    placeholder="Enter your full name"
-                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    placeholder="e.g., Jane Doe"
+                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-green-500 focus:ring-green-500/20 transition-all duration-200"
                   />
-                  <User className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  {errors.fullName && <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg"><AlertCircle className="w-4 h-4" />{errors.fullName.message}</p>}
                 </div>
-                {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.fullName.message}
-                  </p>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-medium">Email Address</Label>
-                <div className="relative">
-                  <Input
-                    id="email"
-                    type="email"
-                    value={user.email || ""}
-                    disabled
-                    className="mt-1 h-12 bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
-                  />
-                  <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                </div>
-                <p className="text-sm text-slate-500 mt-2 flex items-center gap-2 bg-blue-50 dark:bg-blue-950/20 p-2 rounded-lg">
-                  <Mail className="w-4 h-4 text-blue-500" />
-                  This is your login email and cannot be changed
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber" className="text-slate-700 dark:text-slate-300 font-medium">Phone Number *</Label>
-                <div className="relative">
+                {/* Phone Number */}
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber" className="text-slate-700 dark:text-slate-300 font-medium">Phone Number *</Label>
                   <Input
                     id="phoneNumber"
                     {...register("phoneNumber")}
-                    placeholder="+254 700 000 000"
-                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    placeholder="e.g., 0712 345 678"
+                    className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-green-500 focus:ring-green-500/20 transition-all duration-200"
                   />
-                  <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  {errors.phoneNumber && <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg"><AlertCircle className="w-4 h-4" />{errors.phoneNumber.message}</p>}
                 </div>
-                {errors.phoneNumber && (
-                  <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.phoneNumber.message}
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -269,25 +237,23 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
 
       case 2:
         return (
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white via-green-50/30 to-emerald-50/40 dark:from-slate-800 dark:via-slate-700/50 dark:to-green-900/20">
-            <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-3 text-slate-800 dark:text-slate-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Briefcase className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Career Interests</h3>
+          <Card className="border-t-4 border-t-orange-500 shadow-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-lg">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-3">
+                  <Briefcase className="w-6 h-6 text-orange-500" />
+                  <h3 className="text-xl font-semibold">Step 2: Career Interests</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Tell us about your professional goals</p>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="bio" className="text-slate-700 dark:text-slate-300 font-medium">Professional Bio *</Label>
+                <Label htmlFor="bio" className="text-slate-700 dark:text-slate-300 font-medium">Your Professional Story *</Label>
                 <Textarea
                   id="bio"
                   {...register("bio")}
-                  placeholder="Tell employers about yourself, your background, and career goals..."
+                  placeholder="Share a brief summary of your career journey, your key strengths, and what you're looking for in your next role. Think of this as your personal introduction to employers."
                   className="mt-1 min-h-[120px] bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-green-500 focus:ring-green-500/20 transition-all duration-200 resize-none"
                 />
                 <div className="flex justify-between items-center">
@@ -299,7 +265,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       ? 'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300' 
                       : 'bg-orange-100 text-orange-700 dark:bg-orange-950/20 dark:text-orange-300'
                   }`}>
-                    {(watch("bio")?.length || 0) >= 50 ? '✓ Good length' : 'Need more details'}
+                    {(watch("bio")?.length || 0) >= 50 ? '✓ Good length' : 'Minimum 50 characters'}
                   </div>
                 </div>
                 {errors.bio && (
@@ -311,7 +277,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-slate-700 dark:text-slate-300 font-medium">Job Sectors of Interest * (Select multiple)</Label>
+                <Label className="text-slate-700 dark:text-slate-300 font-medium">Which job areas are you interested in? * (Select at least one)</Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {JOB_SECTORS.map((sector, index) => (
                     <Badge
@@ -354,32 +320,32 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
 
       case 3:
         return (
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/40 dark:from-slate-800 dark:via-slate-700/50 dark:to-purple-900/20">
-            <CardHeader className="pb-6">
-              <CardTitle className="flex items-center gap-3 text-slate-800 dark:text-slate-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Education & Experience</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Share your qualifications and skills</p>
+          <Card className="border-t-4 border-t-purple-500 shadow-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-lg">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="w-6 h-6 text-purple-500" />
+                  <h3 className="text-xl font-semibold">Step 3: Background & Skills</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Share your qualifications and upload your CV</p>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="educationLevel" className="text-slate-700 dark:text-slate-300 font-medium">Education Level *</Label>
+                  <Label htmlFor="educationLevel" className="text-slate-700 dark:text-slate-300 font-medium">Highest Level of Education *</Label>
                   <Select onValueChange={(value) => setValue("educationLevel", value)}>
                     <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20">
-                      <SelectValue placeholder="Select your education level" />
+                      <SelectValue placeholder="e.g., Bachelor's Degree, Diploma" />
                     </SelectTrigger>
                     <SelectContent>
-                      {EDUCATION_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level} className="py-3">
-                          {level}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="High School">High School / Secondary School</SelectItem>
+                      <SelectItem value="Diploma">Diploma</SelectItem>
+                      <SelectItem value="Bachelor's Degree">Bachelor's Degree</SelectItem>
+                      <SelectItem value="Master's Degree">Master's Degree</SelectItem>
+                      <SelectItem value="PhD">PhD</SelectItem>
+                      <SelectItem value="Vocational/Technical">Vocational/Technical Certificate</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.educationLevel && (
@@ -391,17 +357,18 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="experienceLevel" className="text-slate-700 dark:text-slate-300 font-medium">Experience Level *</Label>
+                  <Label htmlFor="experienceLevel" className="text-slate-700 dark:text-slate-300 font-medium">Years of Professional Experience *</Label>
                   <Select onValueChange={(value) => setValue("experienceLevel", value)}>
                     <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20">
-                      <SelectValue placeholder="Select your experience level" />
+                      <SelectValue placeholder="e.g., 1-3 years, 5+ years" />
                     </SelectTrigger>
                     <SelectContent>
-                      {EXPERIENCE_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level} className="py-3">
-                          {level}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="No Experience">No Experience / Student</SelectItem>
+                      <SelectItem value="0-1 years">0 - 1 year</SelectItem>
+                      <SelectItem value="1-3 years">1 - 3 years</SelectItem>
+                      <SelectItem value="3-5 years">3 - 5 years</SelectItem>
+                      <SelectItem value="5-10 years">5 - 10 years</SelectItem>
+                      <SelectItem value="10+ years">10+ years</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.experienceLevel && (
@@ -414,15 +381,15 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="skills" className="text-slate-700 dark:text-slate-300 font-medium">Key Skills *</Label>
+                <Label htmlFor="skills" className="text-slate-700 dark:text-slate-300 font-medium">Your Top Skills *</Label>
                 <Input
                   id="skills"
                   {...register("skills")}
-                  placeholder="e.g., JavaScript, React, Project Management, Communication"
+                  placeholder="e.g., Customer Service, Sales, Data Entry, Teamwork"
                   className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
                 />
                 <p className="text-sm text-slate-500 bg-purple-50 dark:bg-purple-950/20 p-2 rounded-lg">
-                  💡 Separate skills with commas for better readability
+                  💡 Tip: Separate each skill with a comma ( , ). List both technical and soft skills.
                 </p>
                 {errors.skills && (
                   <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
@@ -440,22 +407,20 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                 />
               </div>
 
-              {/* Availability and Optional Fields */}
-              <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                   <Clock className="w-5 h-5 text-purple-600" />
-                  Availability & Additional Information
+                  Your Availability & Links
                 </h4>
-                
+              
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="availableFrom" className="text-slate-700 dark:text-slate-300 font-medium">Available to Start *</Label>
+                    <Label htmlFor="availableFrom" className="text-slate-700 dark:text-slate-300 font-medium">When can you start a new job? *</Label>
                     <Input
                       id="availableFrom"
                       type="date"
                       {...register("availableFrom")}
                       className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
-                      min={new Date().toISOString().split('T')[0]}
                     />
                     {errors.availableFrom && (
                       <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
@@ -466,11 +431,11 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="expectedSalary" className="text-slate-700 dark:text-slate-300 font-medium">Expected Salary (Optional)</Label>
+                    <Label htmlFor="expectedSalary" className="text-slate-700 dark:text-slate-300 font-medium">Expected Monthly Salary (Optional)</Label>
                     <Input
                       id="expectedSalary"
                       {...register("expectedSalary")}
-                      placeholder="e.g., KES 50,000 - 80,000"
+                      placeholder="e.g., KES 50,000"
                       className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
                     />
                   </div>
@@ -478,14 +443,14 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="linkedinUrl" className="text-slate-700 dark:text-slate-300 font-medium">LinkedIn Profile (Optional)</Label>
+                    <Label htmlFor="linkedinUrl" className="text-slate-700 dark:text-slate-300 font-medium">Your LinkedIn Profile Link (Optional)</Label>
                     <Input
                       id="linkedinUrl"
                       {...register("linkedinUrl")}
-                      placeholder="https://linkedin.com/in/yourprofile"
+                      placeholder="https://linkedin.com/in/your-profile"
                       className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
                     />
-                    {errors.linkedinUrl && (
+                     {errors.linkedinUrl && (
                       <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
                         <AlertCircle className="w-4 h-4" />
                         {errors.linkedinUrl.message}
@@ -494,19 +459,13 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="portfolioUrl" className="text-slate-700 dark:text-slate-300 font-medium">Portfolio URL (Optional)</Label>
+                    <Label htmlFor="portfolioUrl" className="text-slate-700 dark:text-slate-300 font-medium">Link to Your Work or Portfolio (Optional)</Label>
                     <Input
                       id="portfolioUrl"
                       {...register("portfolioUrl")}
-                      placeholder="https://yourportfolio.com"
+                      placeholder="https://your-portfolio-website.com"
                       className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
                     />
-                    {errors.portfolioUrl && (
-                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.portfolioUrl.message}
-                      </p>
-                    )}
                   </div>
                 </div>
 
@@ -517,10 +476,10 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
-                      <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Interview Assignment Process</h5>
+                      <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">What Happens Next?</h5>
                       <p className="text-sm text-blue-700 dark:text-blue-300">
-                        After registration, our team will review all applications and manually assign interview slots based on your skills and company requirements. 
-                        You'll receive an email and SMS notification with your booth assignment and interview details.
+                        Once you submit your profile, our team will carefully review it. We will then match you with suitable companies and assign you an interview time. 
+                        You'll receive an email and SMS with all the details. Good luck!
                       </p>
                     </div>
                   </div>
