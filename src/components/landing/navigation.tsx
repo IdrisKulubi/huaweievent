@@ -44,7 +44,7 @@ export function Navigation() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <Image
-                  src="/huaweilogo.png"
+                  src="/huaweilogo.jpg"
                   alt="Huawei"
                   width={100}
                   height={40}

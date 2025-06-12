@@ -4,7 +4,7 @@ import Spotify from "next-auth/providers/spotify";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import db from "@/db/drizzle";
-import { users } from "../db/schema";
+import { users, jobSeekers } from "../db/schema";
 
 declare module "next-auth" {
   interface Session {
@@ -14,6 +14,7 @@ declare module "next-auth" {
       role?: string;
       profileCompleted?: boolean;
       hasProfile: boolean;
+      isNewUser?: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -50,24 +51,50 @@ export const {
     error: "/error",
   },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user, trigger }) {
       if (account) {
         token.provider = account.provider;
       }
+      
+      // Mark new users (when account exists, it's usually a sign in)
+      if (account && user) {
+        token.isNewUser = true;
+      }
+      
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
         session.user.email = token.email as string;
+        session.user.isNewUser = !!token.isNewUser;
+        
         try {
-          const profile = await db.select().from(users)
-            .where(eq(users.id, token.sub));
+          // Get user profile including job seeker data
+          const userWithProfile = await db
+            .select({
+              user: users,
+              jobSeeker: jobSeekers,
+            })
+            .from(users)
+            .leftJoin(jobSeekers, eq(jobSeekers.userId, users.id))
+            .where(eq(users.id, token.sub))
+            .limit(1);
           
-          session.user.hasProfile = !!profile[0];
+          const profile = userWithProfile[0];
+          
+          if (profile) {
+            session.user.hasProfile = true;
+            session.user.role = profile.user.role;
+            session.user.profileCompleted = !!profile.jobSeeker?.id;
+          } else {
+            session.user.hasProfile = false;
+            session.user.profileCompleted = false;
+          }
         } catch (error) {
           console.error("Profile check error:", error);
           session.user.hasProfile = false;
+          session.user.profileCompleted = false;
         }
       }
       return session;
