@@ -39,37 +39,17 @@ export function Navigation() {
       <div className="container mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo Section */}
-          <div className="flex items-center gap-6">
-            {/* Huawei Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center">
+            {/* Combined Logo */}
+            <Link href="/" className="flex items-center group">
               <div className="relative">
                 <Image
                   src="/huaweilogo.jpg"
-                  alt="Huawei"
-                  width={100}
-                  height={40}
+                  alt="Nation-Huawei Leap Job Fair"
+                  width={160}
+                  height={100}
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                   priority
-                />
-              </div>
-            </Link>
-
-            {/* Partnership Divider */}
-            <div className="hidden md:flex items-center gap-3">
-              <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">x</span>
-              <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
-            </div>
-
-            {/* Nation Media Logo */}
-            <Link href="/" className="hidden md:flex items-center gap-3 group">
-              <div className="relative">
-                <Image
-                  src="/nationlogo.png"
-                  alt="Nation Media Group"
-                  width={80}
-                  height={32}
-                  className="object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
             </Link>
@@ -180,27 +160,6 @@ export function Navigation() {
                   </Button>
                 </>
               )}
-            </div>
-
-            {/* Mobile Logos */}
-            <div className="md:hidden mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-              <div className="flex items-center justify-center gap-6">
-                <Image
-                  src="/huaweilogo.png"
-                  alt="Huawei"
-                  width={80}
-                  height={32}
-                  className="object-contain"
-                />
-                <div className="w-px h-6 bg-slate-300 dark:bg-slate-600"></div>
-                <Image
-                  src="/nationlogo.png"
-                  alt="Nation Media Group"
-                  width={70}
-                  height={28}
-                  className="object-contain"
-                />
-              </div>
             </div>
           </div>
         </div>

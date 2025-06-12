@@ -85,7 +85,7 @@ export const {
           
           if (profile) {
             session.user.hasProfile = true;
-            session.user.role = profile.user.role;
+            session.user.role = profile.user.role || undefined;
             session.user.profileCompleted = !!profile.jobSeeker?.id;
           } else {
             session.user.hasProfile = false;
