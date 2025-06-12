@@ -87,7 +87,7 @@ export function HeroSection() {
                 size="lg" 
                 className="bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
-                <Link href="/auth/register">
+                <Link href="/login">
                   Register Now
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
