@@ -20,9 +20,11 @@ import {
   BarChart3,
   RefreshCw,
   Download,
+  UserCheck,
 } from "lucide-react";
 import { getDashboardStats, getRecentActivity } from "@/lib/actions/admin-actions";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface AdminDashboardContentProps {
   user: any;
@@ -402,22 +404,60 @@ export function AdminDashboardContent({ user }: AdminDashboardContentProps) {
           <CardTitle className="text-red-800 dark:text-red-200">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600">
-              <Users className="w-6 h-6 mb-2" />
-              <span className="text-sm font-medium">Manage Users</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/users">
+                <Users className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">Manage Users</span>
+              </Link>
             </Button>
-            <Button className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600">
-              <Shield className="w-6 h-6 mb-2" />
-              <span className="text-sm font-medium">Security Center</span>
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/booths">
+                <Building className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">Booth Management</span>
+              </Link>
             </Button>
-            <Button className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600">
-              <BarChart3 className="w-6 h-6 mb-2" />
-              <span className="text-sm font-medium">View Reports</span>
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/booth-assignments">
+                <UserCheck className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">Booth Assignments</span>
+              </Link>
             </Button>
-            <Button className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600">
-              <Calendar className="w-6 h-6 mb-2" />
-              <span className="text-sm font-medium">Event Settings</span>
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/reports">
+                <BarChart3 className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">View Reports</span>
+              </Link>
+            </Button>
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/events">
+                <Calendar className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">Event Settings</span>
+              </Link>
+            </Button>
+            <Button 
+              asChild
+              className="h-auto p-4 flex-col bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600"
+            >
+              <Link href="/admin/crowd-control">
+                <Activity className="w-6 h-6 mb-2" />
+                <span className="text-sm font-medium">Crowd Control</span>
+              </Link>
             </Button>
           </div>
         </CardContent>

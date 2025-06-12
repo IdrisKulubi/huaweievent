@@ -73,6 +73,7 @@ const navigationItems: NavigationItem[] = [
       { title: "Time Batches", href: "/admin/events/time-batches", icon: Clock },
       { title: "Crowd Control", href: "/admin/crowd-control", icon: Zap },
       { title: "Booths Management", href: "/admin/booths", icon: Building },
+      { title: "Booth Assignments", href: "/admin/booth-assignments", icon: UserCheck },
     ],
   },
   {
@@ -220,7 +221,7 @@ export function AdminSidebar() {
       <div className="border-t border-slate-200 dark:border-slate-700 p-4">
         <div className="rounded-lg bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-4">
           <h3 className="text-sm font-semibold text-red-900 dark:text-red-100 mb-2">
-            Huawei Job Fair 2025
+            Nation-Huawei Job Fair 2025
           </h3>
           <div className="space-y-2">
             <Link
@@ -229,6 +230,13 @@ export function AdminSidebar() {
             >
               <Settings className="h-3 w-3" />
               <span>Quick Setup</span>
+            </Link>
+            <Link
+              href="/admin/booth-assignments"
+              className="flex items-center space-x-2 text-xs text-red-800 dark:text-red-200 hover:text-red-900 dark:hover:text-red-100"
+            >
+              <UserCheck className="h-3 w-3" />
+              <span>Booth Assignments</span>
             </Link>
             <Link
               href="/admin/reports"

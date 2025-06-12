@@ -163,9 +163,8 @@ export function Navigation() {
                   <Button 
                     asChild
                     className="w-full bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-md"
-                    onClick={() => setIsOpen(false)}
                   >
-                    <Link href="/auth/register">
+                    <Link href="/auth/register" onClick={() => setIsOpen(false)}>
                       Register Now
                     </Link>
                   </Button>
@@ -174,9 +173,8 @@ export function Navigation() {
                     asChild
                     variant="outline" 
                     className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-                    onClick={() => setIsOpen(false)}
                   >
-                    <Link href="/auth/login">
+                    <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                       Sign In
                     </Link>
                   </Button>

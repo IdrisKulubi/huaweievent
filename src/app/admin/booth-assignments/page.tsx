@@ -113,9 +113,9 @@ export default async function BoothAssignmentPage() {
   }
 
   // Check if user is admin
-  if (session.user.role !== "admin") {
-    redirect("/dashboard");
-  }
+  // if (session.user.role !== "admin") {
+  //   redirect("/dashboard");
+  // }
 
   return (
     <div className="container mx-auto py-8">

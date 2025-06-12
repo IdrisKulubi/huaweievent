@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export function HeroSection() {
@@ -82,19 +83,25 @@ export function HeroSection() {
             {/* CTA Buttons */}
             <div className={`flex flex-col sm:flex-row gap-4 transition-all duration-1000 delay-800 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
               <Button 
+                asChild
                 size="lg" 
                 className="bg-huawei-gradient hover:opacity-90 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
-                Register Now
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <Link href="/auth/register">
+                  Register Now
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
               
               <Button 
+                asChild
                 size="lg" 
                 variant="outline" 
                 className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300"
               >
-                Learn More
+                <Link href="#about">
+                  Learn More
+                </Link>
               </Button>
             </div>
 
