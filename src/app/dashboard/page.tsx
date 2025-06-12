@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Calendar, MapPin, Users, Briefcase, FileText } from "lucide-react";
 import { CVDownloadButton } from "@/components/cv-download-button";
+import Image from "next/image";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -26,16 +27,20 @@ export default async function DashboardPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <img
+              <Image
                 src="/huaweilogo.png"
                 alt="Huawei"
                 className="h-10 object-contain"
+                width={100}
+                height={100}
               />
               <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
-              <img
+              <Image
                 src="/nationlogo.png"
                 alt="Nation Media Group"
                 className="h-8 object-contain"
+                width={100}
+                height={100}
               />
             </div>
             

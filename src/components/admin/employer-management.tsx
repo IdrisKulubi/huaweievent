@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,9 +70,9 @@ interface Employer {
   id: string;
   userId: string;
   companyName: string;
-  contactPerson: string;
+  contactPerson: string | null;
   userEmail: string;
-  contactPhone: string;
+  contactPhone: string | null;
   industry: string;
   companySize: "startup" | "small" | "medium" | "large" | "enterprise";
   website: string;
@@ -96,7 +96,7 @@ export function EmployerManagement() {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const loadEmployers = async () => {
+  const loadEmployers = useCallback(async () => {
     try {
       setLoading(true);
       const filters = {
@@ -106,18 +106,18 @@ export function EmployerManagement() {
       };
       
       const data = await getAllEmployers(filters);
-      setEmployers(data);
+      setEmployers(data as Employer[]);
     } catch (error) {
       console.error("Error loading employers:", error);
       toast.error("Failed to load employers");
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus, filterVerification, searchTerm]);
 
   useEffect(() => {
     loadEmployers();
-  }, [filterStatus, filterVerification]);
+  }, [loadEmployers]);
 
   useEffect(() => {
     const delayedSearch = setTimeout(() => {
@@ -125,7 +125,7 @@ export function EmployerManagement() {
     }, 500);
 
     return () => clearTimeout(delayedSearch);
-  }, [searchTerm]);
+  }, [loadEmployers]);
 
   const handlePromoteToAdmin = async (employer: Employer) => {
     try {

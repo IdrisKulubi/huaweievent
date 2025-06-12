@@ -43,10 +43,20 @@ export default async function AdminBoothsPage() {
   }
 
   // Get all events for dropdown (including inactive ones for admin view)
-  const allEvents = await db
+  const allEventsRaw = await db
     .select()
     .from(events)
     .orderBy(desc(events.createdAt));
+
+  // Transform events to match the Event interface expected by AdminBoothModal
+  const allEvents = allEventsRaw.map(event => ({
+    id: event.id,
+    name: event.name,
+    venue: event.venue,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    isActive: event.isActive ?? true // Convert null to true (default active state)
+  }));
 
   // Get all booths with event and employer information
   const allBooths = await db

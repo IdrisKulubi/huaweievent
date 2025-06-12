@@ -159,9 +159,9 @@ export async function AttendanceHistory({ securityId, limit = 10 }: AttendanceHi
                   <div className="space-y-1">
                     <Badge 
                       variant="outline" 
-                      className={getStatusColor(record.status)}
+                      className={getStatusColor(record.status ?? '')}
                     >
-                      {record.status.replace('_', ' ')}
+                      {record.status?.replace('_', ' ') ?? ''}
                     </Badge>
                     {record.notes && (
                       <p className="text-xs text-gray-500 max-w-32 truncate" title={record.notes}>

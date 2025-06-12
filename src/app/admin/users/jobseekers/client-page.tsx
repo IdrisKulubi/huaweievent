@@ -50,6 +50,7 @@ import { JobSeekerModal } from "@/components/admin/job-seeker-modal";
 import { ViewJobSeekerModal } from "@/components/admin/view-job-seeker-modal";
 import { openCvInNewTab } from "@/lib/r2-utils";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface JobSeekersClientPageProps {
   initialData: {
@@ -526,7 +527,7 @@ export function JobSeekersClientPage({ initialData }: JobSeekersClientPageProps)
               <span className="text-sm text-gray-500">Active filters:</span>
               {searchQuery && (
                 <Badge variant="secondary" className="flex items-center gap-1">
-                  Search: "{searchQuery}"
+                  Search: &quot;{searchQuery}&quot;
                   <button 
                     onClick={() => setSearchQuery("")}
                     className="ml-1 hover:text-red-600"
@@ -606,10 +607,12 @@ export function JobSeekersClientPage({ initialData }: JobSeekersClientPageProps)
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                             {user?.image ? (
-                              <img 
-                                src={user.image} 
+                              <Image 
+                                src={user.image || "/default-avatar.png"} 
                                 alt={user.name} 
                                 className="w-10 h-10 rounded-full object-cover"
+                                width={100}
+                                height={100}
                               />
                             ) : (
                               <span className="text-sm font-medium text-gray-600">

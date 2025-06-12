@@ -192,7 +192,7 @@ export default async function EmployerInterviewsPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <InterviewSlotModal booths={boothsForModal} />
+              <InterviewSlotModal booths={boothsForModal as any} />
               <Button variant="outline" className="border-2 border-blue-300 text-blue-700 hover:bg-blue-50 font-semibold px-6 py-3 rounded-xl">
                 <Settings className="h-5 w-5 mr-2" />
                 Settings
@@ -211,7 +211,7 @@ export default async function EmployerInterviewsPage() {
               <div>
                 <h3 className="text-xl font-bold text-orange-900">👑 Admin Mode Active</h3>
                 <p className="text-orange-800 text-lg font-medium">
-                  You're viewing interview management as an administrator with full access
+                  You&apos;re viewing interview management as an administrator with full access
                 </p>
               </div>
             </div>
@@ -302,7 +302,7 @@ export default async function EmployerInterviewsPage() {
                 🚀 Upcoming Interviews
               </CardTitle>
               <InterviewSlotModal 
-                booths={boothsForModal}
+                booths={boothsForModal as any}
                 trigger={
                   <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                     <Plus className="h-5 w-5 mr-2" />
@@ -325,7 +325,7 @@ export default async function EmployerInterviewsPage() {
                   Create interview slots to start scheduling meetings with talented candidates and grow your team!
                 </p>
                 <InterviewSlotModal 
-                  booths={boothsForModal}
+                  booths={boothsForModal as any}
                   trigger={
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-lg">
                       <Plus className="h-6 w-6 mr-3" />
@@ -373,9 +373,9 @@ export default async function EmployerInterviewsPage() {
                             </div>
                           </div>
                           
-                          <Badge className={`px-4 py-2 font-bold border-2 ${getStatusColor(item.booking?.status, !!item.booking)}`}>
-                            {getStatusIcon(item.booking?.status, !!item.booking)}
-                            <span className="ml-2">{getStatusLabel(item.booking?.status, !!item.booking)}</span>
+                          <Badge className={`px-4 py-2 font-bold border-2 ${getStatusColor(item.booking?.status || '', !!item.booking)}`}>
+                            {getStatusIcon(item.booking?.status || '', !!item.booking)}
+                            <span className="ml-2">{getStatusLabel(item.booking?.status || '', !!item.booking)}</span>
                           </Badge>
                           
                           {item.slot.duration && (

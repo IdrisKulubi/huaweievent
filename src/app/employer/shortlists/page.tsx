@@ -149,7 +149,7 @@ export default async function EmployerShortlistsPage() {
               <div>
                 <h3 className="font-semibold text-orange-900">Admin Mode</h3>
                 <p className="text-orange-800 text-sm">
-                  You're viewing shortlist management as an administrator
+                  You&apos;re viewing shortlist management as an administrator
                 </p>
               </div>
             </div>
@@ -281,10 +281,10 @@ export default async function EmployerShortlistsPage() {
                               <p className="text-sm text-gray-600">{item.user?.email}</p>
                             </div>
                             <div className="flex gap-2">
-                              <Badge className={getStatusColor(item.shortlist.status)}>
+                              <Badge className={getStatusColor(item.shortlist.status || '')}>
                                 {item.shortlist.status}
                               </Badge>
-                              <Badge className={getPriorityColor(item.shortlist.priority)}>
+                              <Badge className={getPriorityColor(item.shortlist.priority || '')}>
                                 {item.shortlist.priority} priority
                               </Badge>
                             </div>

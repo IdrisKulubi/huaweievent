@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -22,15 +22,15 @@ export function CVUploadField({ onFileSelect, onUploadComplete, currentFile }: C
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const allowedTypes = [
+  const allowedTypes = useMemo(() => [
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  ];
+  ], []);
 
-  const maxFileSize = 5 * 1024 * 1024; // 5MB
+  const maxFileSize = useMemo(() => 5 * 1024 * 1024, []); // 5MB
 
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     if (!allowedTypes.includes(file.type)) {
       return "Please upload a PDF or Word document (DOC, DOCX)";
     }
@@ -40,7 +40,7 @@ export function CVUploadField({ onFileSelect, onUploadComplete, currentFile }: C
     }
     
     return null;
-  };
+  }, [allowedTypes, maxFileSize]);
 
   const handleFileSelect = useCallback(async (file: File) => {
     const error = validateFile(file);
@@ -84,7 +84,7 @@ export function CVUploadField({ onFileSelect, onUploadComplete, currentFile }: C
     } finally {
       setIsUploading(false);
     }
-  }, [onFileSelect, onUploadComplete]);
+  }, [onFileSelect, onUploadComplete, validateFile]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

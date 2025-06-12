@@ -29,6 +29,7 @@ import {
   Download
 } from "lucide-react";
 import { openCvInNewTab } from "@/lib/r2-utils";
+import Image from "next/image";
 
 interface JobSeekerData {
   user: {
@@ -153,10 +154,12 @@ export function ViewJobSeekerModal({
               <div className="flex items-start gap-6">
                 <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                   {user.image ? (
-                    <img 
+                    <Image 
                       src={user.image} 
                       alt={user.name} 
                       className="w-24 h-24 rounded-full object-cover"
+                      width={100}
+                      height={100}
                     />
                   ) : (
                     <span className="text-2xl font-medium text-gray-600">

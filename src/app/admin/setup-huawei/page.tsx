@@ -5,7 +5,6 @@ import { users, events } from "@/db/schema";
 import { eq, ilike, and } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Calendar, 
   MapPin, 
@@ -186,7 +185,7 @@ export default async function HuaweiSetupPage() {
           <CardContent>
             <div className="space-y-4">
               <p className="text-yellow-800">
-                Click the "Setup Huawei Event" button to automatically configure:
+                Click the &quot;Setup Huawei Event&quot; button to automatically configure:
               </p>
               <ul className="space-y-2 text-yellow-800">
                 <li className="flex items-center gap-2">

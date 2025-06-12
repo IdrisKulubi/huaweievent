@@ -27,7 +27,7 @@ interface Event {
   venue: string;
   startDate: Date;
   endDate: Date;
-  isActive: boolean;
+  isActive: any;
 }
 
 interface BoothCreationModalProps {

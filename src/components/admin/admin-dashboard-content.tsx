@@ -229,7 +229,7 @@ export function AdminDashboardContent({ user }: AdminDashboardContentProps) {
             Welcome back, {user.name}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Here's what's happening with your event management system today.
+            Here&apos;s what&apos;s happening with your event management system today.
           </p>
         </div>
         <div className="flex items-center gap-3">

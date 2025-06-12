@@ -166,7 +166,7 @@ export default async function EmployerCandidatesPage() {
               <div>
                 <h3 className="text-xl font-bold text-orange-900">👑 Admin Mode Active</h3>
                 <p className="text-orange-800 text-lg font-medium">
-                  You're viewing candidate management with full administrative access
+                  You&apos;re viewing candidate management with full administrative access
                 </p>
               </div>
             </div>
@@ -358,7 +358,6 @@ export default async function EmployerCandidatesPage() {
                       experience: candidate.jobSeeker.experience || undefined,
                       skills: candidate.jobSeeker.skills || undefined,
                       education: candidate.jobSeeker.education || undefined,
-                      location: candidate.jobSeeker.location || undefined,
                       portfolioUrl: candidate.jobSeeker.portfolioUrl || undefined,
                       linkedinUrl: candidate.jobSeeker.linkedinUrl || undefined,
                       cvUrl: candidate.jobSeeker.cvUrl || undefined,

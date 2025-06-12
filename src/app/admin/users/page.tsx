@@ -47,6 +47,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserManagementModal } from "@/components/admin/user-management-modal";
+import Image from "next/image";
 
 async function getUsersData() {
   // Get user statistics
@@ -260,14 +261,14 @@ export default async function AdminUsersPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {userStats.map((stat) => {
-              const Icon = getRoleIcon(stat.role);
+              const Icon = getRoleIcon(stat.role || '');
               return (
                 <div key={stat.role} className="text-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors">
                   <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-50 flex items-center justify-center">
                     <Icon className="h-8 w-8 text-gray-600" />
                   </div>
                   <h3 className="font-semibold text-gray-900 capitalize mb-1">
-                    {stat.role.replace('_', ' ')}
+                    {stat.role?.replace('_', ' ')}
                   </h3>
                   <p className="text-2xl font-bold text-blue-600 mb-1">{stat.count}</p>
                   <div className="flex justify-center gap-2 text-xs">
@@ -355,10 +356,12 @@ export default async function AdminUsersPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                           {user.image ? (
-                            <img 
+                            <Image 
                               src={user.image} 
                               alt={user.name} 
                               className="w-10 h-10 rounded-full object-cover"
+                              width={100}
+                              height={100}
                             />
                           ) : (
                             <span className="text-sm font-medium text-gray-600">
@@ -377,7 +380,7 @@ export default async function AdminUsersPage() {
                     </TableCell>
                     <TableCell>
                       <Badge className={roleColors[user.role as keyof typeof roleColors]}>
-                        {user.role.replace('_', ' ')}
+                        {user.role?.replace('_', ' ')}
                       </Badge>
                     </TableCell>
                     <TableCell>

@@ -31,7 +31,7 @@ import { toast } from "sonner";
 
 interface CreateEventModalProps {
   trigger: React.ReactNode;
-  defaultType?: "job_fair" | "conference" | "workshop" | "networking";
+  defaultType?: "job_fair" | "career_expo" | "networking";
 }
 
 export function CreateEventModal({ trigger, defaultType }: CreateEventModalProps) {
@@ -109,10 +109,16 @@ export function CreateEventModal({ trigger, defaultType }: CreateEventModalProps
     
     try {
       const result = await createEvent({
-        ...formData,
+        name: formData.name,
+        description: formData.description,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        venue: formData.venue,
+        address: formData.address,
         maxAttendees: parseInt(formData.maxAttendees),
-        ticketPrice: formData.ticketPrice ? parseFloat(formData.ticketPrice) : undefined,
-        tags: tags.length > 0 ? tags : undefined
+        eventType: formData.eventType as "job_fair" | "career_expo" | "networking",
+        registrationDeadline: formData.registrationDeadline,
+        isActive: formData.isActive,
       });
 
       if (result.success) {
@@ -153,8 +159,7 @@ export function CreateEventModal({ trigger, defaultType }: CreateEventModalProps
 
   const eventTypeOptions = [
     { value: "job_fair", label: "Job Fair", description: "Career fair with employer booths and interviews" },
-    { value: "conference", label: "Conference", description: "Professional conference with speakers and sessions" },
-    { value: "workshop", label: "Workshop", description: "Interactive learning and training sessions" },
+    { value: "career_expo", label: "Career Expo", description: "Professional career exposition and networking" },
     { value: "networking", label: "Networking", description: "Professional networking and social events" }
   ];
 

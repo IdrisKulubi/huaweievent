@@ -54,6 +54,7 @@ import {
 } from "@/components/ui/select";
 import { RoleManagementModal } from "@/components/admin/role-management-modal";
 import { Switch } from "@/components/ui/switch";
+import Image from "next/image";
 
 // Define role permissions
 const rolePermissions = {
@@ -371,10 +372,12 @@ export default async function AdminRoleManagementPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                             {user.image ? (
-                              <img 
+                              <Image 
                                 src={user.image} 
                                 alt={user.name} 
                                 className="w-10 h-10 rounded-full object-cover"
+                                width={100}
+                                height={100}
                               />
                             ) : (
                               <span className="text-sm font-medium text-gray-600">
@@ -399,8 +402,7 @@ export default async function AdminRoleManagementPage() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Switch 
-                            checked={user.isActive} 
-                            size="sm"
+                            checked={user.isActive || false} 
                           />
                           <span className={`text-sm ${user.isActive ? 'text-green-700' : 'text-gray-500'}`}>
                             {user.isActive ? 'Active' : 'Inactive'}

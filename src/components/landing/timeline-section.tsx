@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Clock, MapPin, Users, Coffee, Presentation, Award } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Coffee, Presentation, Award, Building2, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface TimelineEvent {
@@ -17,57 +17,66 @@ interface TimelineEvent {
 
 const day1Events: TimelineEvent[] = [
   {
-    time: "08:00 - 09:00",
+    time: "08:30 - 09:00",
     title: "Registration & Welcome",
-    description: "Check-in, welcome kit distribution, and networking breakfast",
+    description: "Check-in, welcome kit distribution, and early networking",
     icon: Users,
     type: "main",
-    location: "Main Lobby",
+    location: "Main Entrance",
     capacity: "1000+ attendees"
   },
   {
     time: "09:00 - 09:30",
     title: "Opening Ceremony",
-    description: "Welcome address by Huawei leadership and Nation Media Group",
+    description: "Welcome address by Nation Media Group and Huawei Technologies leadership",
     icon: Presentation,
     type: "special",
-    location: "Main Auditorium",
+    location: "Main Stage",
     capacity: "All attendees"
   },
   {
     time: "09:30 - 12:00",
-    title: "Morning Interview Sessions",
-    description: "First round of interviews and employer presentations",
-    icon: Clock,
+    title: "Innovative Booths Experience",
+    description: "Immersive company booths, resume drops, and direct dialogue with business representatives",
+    icon: Building2,
     type: "main",
-    location: "Interview Zones A-F",
-    capacity: "500+ slots"
-  },
-  {
-    time: "12:00 - 13:00",
-    title: "Networking Lunch",
-    description: "Sponsored lunch with networking opportunities",
-    icon: Coffee,
-    type: "networking",
-    location: "Dining Hall",
+    location: "Exhibition Area",
     capacity: "All attendees"
   },
   {
-    time: "13:00 - 17:00",
+    time: "10:00 - 12:00",
+    title: "Morning Panel Discussions",
+    description: "Sectoral insights from industry leaders and voice of experts",
+    icon: Presentation,
+    type: "special",
+    location: "Panel Hall",
+    capacity: "300+ attendees"
+  },
+  {
+    time: "12:00 - 13:00",
+    title: "Connect & Converse Lunch",
+    description: "Networking lunch fostering organic, meaningful career-boosting interactions",
+    icon: MessageCircle,
+    type: "networking",
+    location: "Networking Zone",
+    capacity: "All attendees"
+  },
+  {
+    time: "13:00 - 16:00",
     title: "Afternoon Sessions",
-    description: "Continued interviews, career workshops, and tech talks",
+    description: "Continued booth visits, interviews, and career development workshops",
     icon: Users,
     type: "main",
     location: "All Zones",
-    capacity: "600+ slots"
+    capacity: "500+ slots"
   },
   {
-    time: "17:00 - 18:00",
+    time: "16:00 - 16:00",
     title: "Day 1 Wrap-up",
-    description: "Feedback collection and day 2 briefing",
+    description: "Feedback collection and day 2 preview",
     icon: Clock,
     type: "special",
-    location: "Main Auditorium",
+    location: "Main Stage",
     capacity: "All attendees"
   }
 ];
@@ -75,56 +84,56 @@ const day1Events: TimelineEvent[] = [
 const day2Events: TimelineEvent[] = [
   {
     time: "08:30 - 09:00",
-    title: "Day 2 Check-in",
-    description: "Quick registration for day 2 activities",
+    title: "Day 2 Welcome",
+    description: "Quick check-in and day 2 orientation",
     icon: Users,
     type: "main",
-    location: "Main Lobby",
+    location: "Main Entrance",
     capacity: "800+ attendees"
   },
   {
     time: "09:00 - 12:00",
-    title: "Final Interview Rounds",
-    description: "Last chance interviews and final presentations",
-    icon: Clock,
+    title: "Final Booth Sessions",
+    description: "Last chance to visit innovative booths and connect with employers",
+    icon: Building2,
     type: "main",
-    location: "Interview Zones A-F",
-    capacity: "400+ slots"
+    location: "Exhibition Area",
+    capacity: "All attendees"
   },
   {
-    time: "12:00 - 13:00",
-    title: "Industry Panel",
-    description: "Tech industry leaders panel discussion",
+    time: "10:00 - 12:00",
+    title: "Final Panel Discussions",
+    description: "Closing panel sessions with key industry insights",
     icon: Presentation,
     type: "special",
-    location: "Main Auditorium",
-    capacity: "All attendees"
-  },
-  {
-    time: "13:00 - 14:00",
-    title: "Lunch & Networking",
-    description: "Final networking opportunity with refreshments",
-    icon: Coffee,
-    type: "networking",
-    location: "Dining Hall",
-    capacity: "All attendees"
-  },
-  {
-    time: "14:00 - 16:00",
-    title: "Career Workshops",
-    description: "Skills development and career guidance sessions",
-    icon: Users,
-    type: "main",
-    location: "Workshop Rooms",
+    location: "Panel Hall",
     capacity: "300+ attendees"
   },
   {
-    time: "16:00 - 17:00",
+    time: "12:00 - 13:00",
+    title: "Final Networking Lunch",
+    description: "Last networking opportunity with refreshments and connections",
+    icon: MessageCircle,
+    type: "networking",
+    location: "Networking Zone",
+    capacity: "All attendees"
+  },
+  {
+    time: "13:00 - 15:30",
+    title: "Career Development Sessions",
+    description: "Skills workshops and professional development opportunities",
+    icon: Users,
+    type: "main",
+    location: "Workshop Rooms",
+    capacity: "400+ attendees"
+  },
+  {
+    time: "15:30 - 16:00",
     title: "Closing Ceremony",
-    description: "Awards, recognitions, and event conclusion",
+    description: "Event conclusion, awards, and future opportunities announcement",
     icon: Award,
     type: "special",
-    location: "Main Auditorium",
+    location: "Main Stage",
     capacity: "All attendees"
   }
 ];
@@ -202,7 +211,7 @@ export function TimelineSection() {
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
-              Day 1 - December 15
+              Day 1 - June 26, 2025
             </button>
             <button
               onClick={() => setActiveDay(2)}
@@ -212,7 +221,7 @@ export function TimelineSection() {
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
-              Day 2 - December 16
+              Day 2 - June 27, 2025
             </button>
           </div>
         </div>

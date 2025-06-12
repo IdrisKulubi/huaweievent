@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { users, booths, employers } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 
@@ -74,8 +74,10 @@ export async function createAdminBooth(formData: {
     const existingBooth = await db
       .select()
       .from(booths)
-      .where(eq(booths.eventId, formData.eventId))
-      .where(eq(booths.boothNumber, formData.boothNumber))
+      .where(and(
+        eq(booths.eventId, formData.eventId),
+        eq(booths.boothNumber, formData.boothNumber)
+      ))
       .limit(1);
 
     if (existingBooth[0]) {
@@ -146,7 +148,7 @@ export async function updateAdminBooth(boothId: string, formData: {
           message: `No employer found with email: ${formData.employerEmail}` 
         };
       }
-      employerId = employer[0].employers.id;
+      employerId = employer[0].employer.id;
     }
 
     // Update booth
@@ -266,8 +268,10 @@ export async function createUnassignedBooth(formData: {
     const existingBooth = await db
       .select()
       .from(booths)
-      .where(eq(booths.eventId, formData.eventId))
-      .where(eq(booths.boothNumber, formData.boothNumber))
+      .where(and(
+        eq(booths.eventId, formData.eventId),
+        eq(booths.boothNumber, formData.boothNumber)
+      ))
       .limit(1);
 
     if (existingBooth[0]) {

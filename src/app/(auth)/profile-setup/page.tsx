@@ -33,10 +33,12 @@ export default async function ProfileSetupPage() {
                 height={100}
               />
               <div className="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
-              <img
+              <Image
                 src="/nationlogo.png"
                 alt="Nation Media Group"
                 className="h-8 object-contain"
+                width={100}
+                height={100}
               />
             </div>
             

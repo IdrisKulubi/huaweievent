@@ -22,6 +22,15 @@ interface CreateJobSeekerProfileData {
   availableFrom: string;
   cvUrl: string;
   interestCategories: string[];
+  additionalDocuments?: Array<{
+    id: string;
+    name: string;
+    url: string;
+    uploadKey: string;
+    uploadedAt: string;
+    fileSize?: number;
+    fileType?: string;
+  }>;
 }
 
 export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
@@ -98,6 +107,7 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
           userId: data.userId,
           bio: data.bio,
           cvUrl: data.cvUrl,
+          additionalDocuments: data.additionalDocuments || [],
           skills: data.skills,
           experience: data.experienceLevel,
           education: data.educationLevel,
@@ -245,6 +255,7 @@ export async function updateUserProfile(userId: string, updates: Partial<CreateJ
       
       if (updates.bio) jobSeekerUpdates.bio = updates.bio;
       if (updates.cvUrl) jobSeekerUpdates.cvUrl = updates.cvUrl;
+      if (updates.additionalDocuments !== undefined) jobSeekerUpdates.additionalDocuments = updates.additionalDocuments;
       if (updates.skills) jobSeekerUpdates.skills = updates.skills;
       if (updates.experienceLevel) jobSeekerUpdates.experience = updates.experienceLevel;
       if (updates.educationLevel) jobSeekerUpdates.education = updates.educationLevel;

@@ -61,8 +61,16 @@ export function EmployerSetupForm({ userId, userName }: EmployerSetupFormProps) 
     startTransition(async () => {
       try {
         const response = await createEmployerProfile({
-          ...formData,
           userId,
+          companyName: formData.companyName,
+          companyDescription: formData.companyDescription,
+          industry: formData.industry,
+          companySize: formData.companySize as "small" | "startup" | "medium" | "large" | "enterprise",
+          website: formData.website,
+          address: formData.address,
+          contactPerson: formData.contactPerson,
+          contactEmail: formData.contactEmail,
+          contactPhone: formData.contactPhone,
         });
         
         setResult(response);

@@ -12,7 +12,10 @@ import {
   Clock,
   CheckCircle,
   Star,
-  Zap
+  Zap,
+  MessageCircle,
+  Presentation,
+  Building2
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -20,11 +23,32 @@ interface Feature {
   icon: React.ElementType;
   title: string;
   description: string;
-  category: "seeker" | "employer" | "admin" | "security";
+  category: "seeker" | "employer" | "admin" | "security" | "highlights";
   highlight?: boolean;
 }
 
 const features: Feature[] = [
+  {
+    icon: Building2,
+    title: "Innovative Booths",
+    description: "Dive into immersive company experiences, drop off resumes, and dialogue with business representatives.",
+    category: "highlights",
+    highlight: true
+  },
+  {
+    icon: Presentation,
+    title: "Engaging Panel Discussions",
+    description: "Sectoral insights from the voices that lead them - learn from industry experts and thought leaders.",
+    category: "highlights",
+    highlight: true
+  },
+  {
+    icon: MessageCircle,
+    title: "Connect & Converse",
+    description: "Foster organic, meaningful, career-boosting interactions with professionals and peers.",
+    category: "highlights",
+    highlight: true
+  },
   {
     icon: Users,
     title: "Smart Registration",
@@ -35,8 +59,7 @@ const features: Feature[] = [
     icon: QrCode,
     title: "QR Code Check-in",
     description: "Digital QR codes for quick event entry and interview slot management.",
-    category: "seeker",
-    highlight: true
+    category: "seeker"
   },
   {
     icon: Calendar,
@@ -54,8 +77,7 @@ const features: Feature[] = [
     icon: Star,
     title: "CV Access Portal",
     description: "Instant access to candidate profiles and CV library with smart filtering.",
-    category: "employer",
-    highlight: true
+    category: "employer"
   },
   {
     icon: CheckCircle,
@@ -73,8 +95,7 @@ const features: Feature[] = [
     icon: Clock,
     title: "Real-time Monitoring",
     description: "Live attendance tracking and incident reporting capabilities.",
-    category: "security",
-    highlight: true
+    category: "security"
   },
   {
     icon: Smartphone,
@@ -91,6 +112,7 @@ const features: Feature[] = [
 ];
 
 const categoryColors = {
+  highlights: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
   seeker: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
   employer: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   security: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
@@ -98,6 +120,7 @@ const categoryColors = {
 };
 
 const categoryLabels = {
+  highlights: "Event Highlights",
   seeker: "Job Seekers",
   employer: "Employers",
   security: "Security",
@@ -106,7 +129,7 @@ const categoryLabels = {
 
 export function FeaturesSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>("highlights");
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -142,22 +165,22 @@ export function FeaturesSection() {
             variant="outline" 
             className="mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700"
           >
-            Platform Features
+            Event Experience
           </Badge>
           
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-slate-100 dark:via-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
-              Everything You Need for a
+              A Grand Gathering of
             </span>
             <br />
             <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
-              Successful Career Event
+              Innovation, Synergy & Opportunity
             </span>
           </h2>
           
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Our comprehensive platform provides all stakeholders with powerful tools 
-            to ensure a seamless and productive job fair experience.
+            More than just an event - it&apos;s an avenue for innovation, synergy, and opportunity. 
+            Job opportunities are futures waiting to be shaped.
           </p>
         </div>
 

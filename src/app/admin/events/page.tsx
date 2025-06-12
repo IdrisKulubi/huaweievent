@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { CreateEventModal } from "@/components/admin/create-event-modal";
 import { EventActionsMenu } from "@/components/admin/event-actions-menu";
-import { EventFilters } from "@/components/admin/event-filters";
 
 export default async function EventsPage() {
   const session = await auth();
@@ -63,7 +62,7 @@ export default async function EventsPage() {
   const totalEvents = allEvents.length;
   const activeEvents = allEvents.filter(e => e.event.isActive).length;
   const upcomingEvents = allEvents.filter(e => e.event.startDate > new Date()).length;
-  const totalAttendeeCapacity = allEvents.reduce((sum, e) => sum + e.event.maxAttendees, 0);
+  const totalAttendeeCapacity = allEvents.reduce((sum, e) => sum + (e.event.maxAttendees ?? 0), 0);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -297,8 +296,8 @@ export default async function EventsPage() {
                           <Badge className={status.color}>
                             {status.label}
                           </Badge>
-                          <Badge className={getEventTypeColor(event.eventType)}>
-                            {event.eventType.replace('_', ' ').toUpperCase()}
+                          <Badge className={getEventTypeColor(event.eventType ?? '')}>
+                            {event.eventType?.replace('_', ' ').toUpperCase()}
                           </Badge>
                         </div>
                         
@@ -321,7 +320,7 @@ export default async function EventsPage() {
                           
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Users className="h-4 w-4 text-purple-500" />
-                            <span>{event.maxAttendees.toLocaleString()} capacity</span>
+                            <span>{event.maxAttendees?.toLocaleString()} capacity</span>
                           </div>
 
                           <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -330,15 +329,7 @@ export default async function EventsPage() {
                           </div>
                         </div>
 
-                        {event.tags && event.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-3">
-                            {event.tags.map((tag, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
+                       
                       </div>
 
                       <EventActionsMenu event={event} />
@@ -349,12 +340,8 @@ export default async function EventsPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6 text-sm text-gray-500">
                           <span>Created {new Date(event.createdAt).toLocaleDateString()}</span>
-                          {event.organizerEmail && (
-                            <span>Organizer: {event.organizerEmail}</span>
-                          )}
-                          {event.ticketPrice && (
-                            <span>Price: {event.currency} {event.ticketPrice}</span>
-                          )}
+                         
+                       
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -366,14 +353,7 @@ export default async function EventsPage() {
                             <BarChart3 className="h-4 w-4 mr-1" />
                             Analytics
                           </Button>
-                          {event.websiteUrl && (
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={event.websiteUrl} target="_blank" rel="noopener noreferrer">
-                                <Globe className="h-4 w-4 mr-1" />
-                                Website
-                              </a>
-                            </Button>
-                          )}
+                    
                         </div>
                       </div>
                     </div>

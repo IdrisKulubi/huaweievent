@@ -130,7 +130,7 @@ export default async function SecurityDashboard() {
                   </p>
                   {!security && (
                     <p className="text-sm mt-2 text-blue-700">
-                      <strong>Note:</strong> You're using temporary admin access. Consider creating a security personnel record for better tracking.
+                      <strong>Note:</strong> You&apos;re using temporary admin access. Consider creating a security personnel record for better tracking.
                     </p>
                   )}
                 </div>

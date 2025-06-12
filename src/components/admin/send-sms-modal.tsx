@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -218,7 +216,7 @@ export function SendSMSModal({
                 <div className="bg-white rounded-lg p-4 border border-blue-200">
                   <p className="text-sm text-gray-700">
                     <strong>Message Preview:</strong><br />
-                    "📅 Hi [Name]! Reminder: [Event Name] is on [Date] at [Venue]. Don't forget your PIN for check-in! 🚀"
+                    &quot;📅 Hi [Name]! Reminder: [Event Name] is on [Date] at [Venue]. Don&apos;t forget your PIN for check-in! 🚀&quot;
                   </p>
                 </div>
               </CardContent>

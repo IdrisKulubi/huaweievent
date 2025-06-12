@@ -107,7 +107,7 @@ export function CheckpointSelector({
                     {checkpoint.maxCapacity && (
                       <div className="flex items-center gap-1 text-xs">
                         <Users className="h-3 w-3" />
-                        <span className={getOccupancyStatus(checkpoint.currentOccupancy, checkpoint.maxCapacity)}>
+                        <span className={getOccupancyStatus(checkpoint.currentOccupancy, checkpoint.maxCapacity) ?? ''}>
                           {checkpoint.currentOccupancy}/{checkpoint.maxCapacity}
                         </span>
                       </div>

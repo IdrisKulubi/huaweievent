@@ -463,7 +463,7 @@ export async function bulkDeleteInterviewSlots(slotIds: string[]) {
     }
 
     let deletedCount = 0;
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     for (const slotId of slotIds) {
       const result = await deleteInterviewSlot(slotId);
@@ -567,29 +567,47 @@ export async function searchInterviewSlots(params: {
       }
     }
 
-    let query = db
-      .select({
-        slot: interviewSlots,
-        booking: interviewBookings,
-        jobSeeker: {
-          id: users.id,
-          name: users.name,
-          email: users.email
-        },
-        booth: booths,
-        event: events,
-      })
-      .from(interviewSlots)
-      .leftJoin(interviewBookings, eq(interviewBookings.interviewSlotId, interviewSlots.id))
-      .leftJoin(users, eq(users.id, interviewBookings.jobSeekerId))
-      .leftJoin(booths, eq(booths.id, interviewSlots.boothId))
-      .leftJoin(events, eq(events.id, booths.eventId));
-
+    let results;
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      results = await db
+        .select({
+          slot: interviewSlots,
+          booking: interviewBookings,
+          jobSeeker: {
+            id: users.id,
+            name: users.name,
+            email: users.email
+          },
+          booth: booths,
+          event: events,
+        })
+        .from(interviewSlots)
+        .leftJoin(interviewBookings, eq(interviewBookings.interviewSlotId, interviewSlots.id))
+        .leftJoin(users, eq(users.id, interviewBookings.jobSeekerId))
+        .leftJoin(booths, eq(booths.id, interviewSlots.boothId))
+        .leftJoin(events, eq(events.id, booths.eventId))
+        .where(and(...conditions))
+        .orderBy(desc(interviewSlots.startTime));
+    } else {
+      results = await db
+        .select({
+          slot: interviewSlots,
+          booking: interviewBookings,
+          jobSeeker: {
+            id: users.id,
+            name: users.name,
+            email: users.email
+          },
+          booth: booths,
+          event: events,
+        })
+        .from(interviewSlots)
+        .leftJoin(interviewBookings, eq(interviewBookings.interviewSlotId, interviewSlots.id))
+        .leftJoin(users, eq(users.id, interviewBookings.jobSeekerId))
+        .leftJoin(booths, eq(booths.id, interviewSlots.boothId))
+        .leftJoin(events, eq(events.id, booths.eventId))
+        .orderBy(desc(interviewSlots.startTime));
     }
-
-    let results = await query.orderBy(desc(interviewSlots.startTime));
 
     // Apply text search filter
     if (params.searchTerm) {
@@ -663,20 +681,20 @@ export async function getEmployerBooth(eventId?: string) {
     const employer = employerProfile[0];
 
     // Get booth for this employer
-    const boothQuery = db
+    const boothConditions = [eq(booths.employerId, employer.id)];
+    if (eventId) {
+      boothConditions.push(eq(booths.eventId, eventId));
+    }
+
+    const result = await db
       .select({
         booth: booths,
         event: events,
       })
       .from(booths)
       .leftJoin(events, eq(events.id, booths.eventId))
-      .where(eq(booths.employerId, employer.id));
-
-    if (eventId) {
-      boothQuery.where(eq(booths.eventId, eventId));
-    }
-
-    const result = await boothQuery.limit(1);
+      .where(and(...boothConditions))
+      .limit(1);
     
     return result[0] || null;
   } catch (error) {

@@ -29,7 +29,7 @@ const socialLinks = [
   { name: "Facebook", icon: Facebook, href: "#", color: "hover:text-blue-600" },
   { name: "Twitter", icon: Twitter, href: "#", color: "hover:text-blue-400" },
   { name: "LinkedIn", icon: Linkedin, href: "#", color: "hover:text-blue-700" },
-  { name: "Instagram", icon: Instagram, href: "#", color: "hover:text-pink-600" }
+  { name: "Instagram", icon: Instagram, href: "@/huaweievent", color: "hover:text-pink-600" }
 ];
 
 export function FooterSection() {
@@ -41,6 +41,10 @@ export function FooterSection() {
           {/* Brand Section */}
           <div className="lg:col-span-1 space-y-6">
             <div className="space-y-4">
+              <div className="text-lg font-bold text-white">
+                Nation-Huawei Leap Job Fair
+              </div>
+              
               {/* Huawei Logo */}
               <div className="flex items-center gap-4">
                 <Image
@@ -70,8 +74,8 @@ export function FooterSection() {
             </div>
             
             <p className="text-slate-300 text-sm leading-relaxed">
-              Connecting talent with opportunity through innovative technology 
-              and comprehensive career development solutions.
+              A bold partnership catalyzing Kenya&apos;s job sector. Bridging talent with businesses 
+              that need it, inspiring a generation of professionals to reach their utmost potential.
             </p>
             
             {/* Social Links */}
@@ -116,8 +120,8 @@ export function FooterSection() {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-[var(--huawei-red)] mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-slate-300">
-                  <p className="font-medium text-white">Kenyatta International Convention Centre</p>
-                  <p>Harambee Avenue, Nairobi, Kenya</p>
+                  <p className="font-medium text-white">University of Nairobi Grounds</p>
+                  <p>UON Campus, Nairobi, Kenya</p>
                 </div>
               </div>
               
@@ -131,14 +135,14 @@ export function FooterSection() {
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[var(--huawei-red)] flex-shrink-0" />
                 <div className="text-sm text-slate-300">
-                  <p>info@huaweicareersum</p>
+                  <p>info@nation-huawei-leap.com</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <Globe className="w-5 h-5 text-[var(--nation-blue)] flex-shrink-0" />
                 <div className="text-sm text-slate-300">
-                  <p>www.huawei-nation-careerfair.com</p>
+                  <p>@/huaweievent</p>
                 </div>
               </div>
             </div>
@@ -153,8 +157,8 @@ export function FooterSection() {
                   <Calendar className="w-5 h-5 text-[var(--huawei-red)]" />
                   <span className="font-medium text-white">Event Dates</span>
                 </div>
-                <p className="text-sm text-slate-300">December 15-16, 2024</p>
-                <p className="text-sm text-slate-300">Two full days of opportunities</p>
+                <p className="text-sm text-slate-300">June 26-27, 2025</p>
+                <p className="text-sm text-slate-300">Two days of opportunities</p>
               </div>
               
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
@@ -162,7 +166,7 @@ export function FooterSection() {
                   <Clock className="w-5 h-5 text-[var(--nation-blue)]" />
                   <span className="font-medium text-white">Event Hours</span>
                 </div>
-                <p className="text-sm text-slate-300">8:00 AM - 6:00 PM</p>
+                <p className="text-sm text-slate-300">9:00 AM - 4:00 PM</p>
                 <p className="text-sm text-slate-300">Both days</p>
               </div>
             </div>
@@ -171,7 +175,7 @@ export function FooterSection() {
             <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-lg p-4 border border-slate-600">
               <h4 className="font-medium text-white mb-3">Stay Updated</h4>
               <p className="text-sm text-slate-300 mb-4">
-                Get the latest updates about the event
+                Get the latest updates about the Nation-Huawei Leap Job Fair
               </p>
               <div className="flex gap-2">
                 <input
@@ -196,30 +200,19 @@ export function FooterSection() {
         <div className="container mx-auto px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-slate-400">
-              <p>&copy; 2024 Huawei Career Summit. All rights reserved.</p>
+              <p>&copy; 2025 Nation-Huawei Leap Job Fair. All rights reserved.</p>
             </div>
-            
-            <div className="flex flex-wrap gap-6 text-sm text-slate-400">
+            <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/privacy" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
               <Link href="/terms" className="hover:text-white transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/cookies" className="hover:text-white transition-colors">
-                Cookie Policy
-              </Link>
-              <Link href="/accessibility" className="hover:text-white transition-colors">
-                Accessibility
+              <Link href="/support" className="hover:text-white transition-colors">
+                Support
               </Link>
             </div>
-          </div>
-          
-          {/* Powered by */}
-          <div className="text-center mt-6 pt-6 border-t border-slate-800">
-            <p className="text-xs text-slate-500">
-              Platform powered by advanced job fair management technology
-            </p>
           </div>
         </div>
       </div>

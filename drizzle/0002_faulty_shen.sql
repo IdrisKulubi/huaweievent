@@ -1,0 +1,1 @@
+ALTER TABLE "job_seeker" ADD COLUMN "additional_documents" json;

@@ -46,6 +46,15 @@ export const jobSeekers = pgTable(
     userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     bio: text("bio"),
     cvUrl: text("cv_url"),
+    additionalDocuments: json("additional_documents").$type<Array<{
+      id: string;
+      name: string;
+      url: string;
+      uploadKey: string;
+      uploadedAt: string;
+      fileSize?: number;
+      fileType?: string;
+    }>>(),
     skills: json("skills").$type<string[]>(),
     experience: text("experience"),
     education: text("education"),

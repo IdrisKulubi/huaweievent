@@ -93,12 +93,21 @@ export function EventManagement() {
       const eventData = await getCurrentEvent();
       
       if (eventData) {
-        // Transform dates to the format expected by date inputs
+        // Transform dates to the format expected by date inputs and handle nullable fields
         setCurrentEvent({
-          ...eventData,
+          id: eventData.id,
+          name: eventData.name,
+          description: eventData.description || "",
+          venue: eventData.venue,
+          address: eventData.address || "",
+          maxAttendees: eventData.maxAttendees || 0,
+          isActive: eventData.isActive ?? true,
+          eventType: eventData.eventType || "job_fair",
+          currentAttendees: eventData.currentAttendees || 0,
+          checkedInAttendees: eventData.checkedInAttendees || 0,
           startDate: new Date(eventData.startDate).toISOString().split('T')[0],
           endDate: new Date(eventData.endDate).toISOString().split('T')[0],
-          registrationDeadline: new Date(eventData.registrationDeadline).toISOString().split('T')[0],
+          registrationDeadline: eventData.registrationDeadline ? new Date(eventData.registrationDeadline).toISOString().split('T')[0] : "",
         });
       } else {
         toast.info("No active event found. Please create an event first.");

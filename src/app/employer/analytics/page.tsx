@@ -188,7 +188,18 @@ export default async function EmployerAnalyticsPage() {
     interactionTypes,
     dailyInteractions,
     recentInteractions
-  ] = await Promise.all(analyticsPromises);
+  ] = await Promise.all(analyticsPromises) as [
+    { count: number }[],
+    { count: number }[],
+    { count: number }[],
+    { count: number }[],
+    { count: number }[],
+    { count: number }[],
+    any[],
+    any[],
+    any[],
+    any[]
+  ];
 
   const getInteractionTypeLabel = (type?: string) => {
     if (!type) return "Unknown";
@@ -243,7 +254,7 @@ export default async function EmployerAnalyticsPage() {
               <div>
                 <h3 className="font-semibold text-orange-900">Admin Mode</h3>
                 <p className="text-orange-800 text-sm">
-                  You're viewing analytics as an administrator. Data will be limited to sample data.
+                  You&apos;re viewing analytics as an administrator. Data will be limited to sample data.
                 </p>
               </div>
             </div>

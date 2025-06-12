@@ -28,27 +28,27 @@ export function HeroSection() {
             {/* Event Badge */}
             <div className={`inline-flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 text-sm font-medium transition-all duration-1000 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
               <div className="w-2 h-2 bg-huawei-gradient rounded-full animate-pulse"></div>
-              <span className="text-slate-600 dark:text-slate-300">Premier Technology Career Event</span>
+              <span className="text-slate-600 dark:text-slate-300">Catalyzing Kenya&apos;s Job Sector</span>
             </div>
 
             {/* Main Headline */}
             <div className="space-y-4">
               <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold leading-tight transition-all duration-1000 delay-200 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
                 <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-slate-100 dark:via-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
-                  Huawei
+                  Nation-Huawei
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
-                  Career
+                  Leap Job
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
-                  Summit
+                  Fair
                 </span>
               </h1>
               
               <p className={`text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed transition-all duration-1000 delay-400 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
-                Connect with leading technology professionals, explore cutting-edge career opportunities, and shape your future in the digital transformation era.
+                A bold partnership between Nation Media Group and Huawei Technologies to bridge the talent in Kenya with businesses that need it, inspiring a generation of professionals to reach their utmost potential.
               </p>
             </div>
 
@@ -58,7 +58,7 @@ export function HeroSection() {
                 <Calendar className="w-5 h-5 text-[var(--huawei-red)]" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Date</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Dec 15-16, 2024</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Jun 26-27, 2025</p>
                 </div>
               </div>
               
@@ -66,15 +66,15 @@ export function HeroSection() {
                 <MapPin className="w-5 h-5 text-[var(--nation-blue)]" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Venue</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">KICC, Nairobi</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">UON Grounds, Nairobi</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                 <Users className="w-5 h-5 text-[var(--huawei-red)]" />
                 <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Expected</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">1000+ Attendees</p>
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Time</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">9am - 4pm Daily</p>
                 </div>
               </div>
             </div>
@@ -105,12 +105,12 @@ export function HeroSection() {
                 <p className="text-sm text-slate-600 dark:text-slate-400">Companies</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">200+</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Positions</p>
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">500+</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Opportunities</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">48h</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Event Duration</p>
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">2</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Days</p>
               </div>
             </div>
           </div>

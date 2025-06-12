@@ -21,17 +21,9 @@ interface CreateEventData {
   venue: string;
   address: string;
   maxAttendees: number;
-  eventType: "job_fair" | "conference" | "workshop" | "networking";
+  eventType: "job_fair" | "career_expo" | "networking";
   registrationDeadline: string;
   isActive: boolean;
-  tags?: string[];
-  organizerEmail?: string;
-  organizerPhone?: string;
-  websiteUrl?: string;
-  logoUrl?: string;
-  requirements?: string;
-  ticketPrice?: number;
-  currency?: string;
 }
 
 interface UpdateEventData extends Partial<CreateEventData> {
@@ -102,17 +94,7 @@ export async function createEvent(data: CreateEventData) {
       eventType: data.eventType,
       registrationDeadline,
       isActive: data.isActive,
-      tags: data.tags || [],
-      organizerEmail: data.organizerEmail,
-      organizerPhone: data.organizerPhone,
-      websiteUrl: data.websiteUrl,
-      logoUrl: data.logoUrl,
-      requirements: data.requirements,
-      ticketPrice: data.ticketPrice,
-      currency: data.currency || "KES",
       createdBy: session.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
     // Create default checkpoints for job fairs
@@ -257,14 +239,6 @@ export async function updateEvent(data: UpdateEventData) {
     if (data.eventType) updateData.eventType = data.eventType;
     if (data.registrationDeadline) updateData.registrationDeadline = new Date(data.registrationDeadline);
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
-    if (data.tags) updateData.tags = data.tags;
-    if (data.organizerEmail) updateData.organizerEmail = data.organizerEmail;
-    if (data.organizerPhone) updateData.organizerPhone = data.organizerPhone;
-    if (data.websiteUrl) updateData.websiteUrl = data.websiteUrl;
-    if (data.logoUrl) updateData.logoUrl = data.logoUrl;
-    if (data.requirements) updateData.requirements = data.requirements;
-    if (data.ticketPrice !== undefined) updateData.ticketPrice = data.ticketPrice;
-    if (data.currency) updateData.currency = data.currency;
 
     await db
       .update(events)
@@ -483,7 +457,9 @@ export async function duplicateEvent(eventId: string, newName: string) {
     const oneWeekLater = 7 * 24 * 60 * 60 * 1000;
     const newStartDate = new Date(event.startDate.getTime() + oneWeekLater);
     const newEndDate = new Date(event.endDate.getTime() + oneWeekLater);
-    const newRegDeadline = new Date(event.registrationDeadline.getTime() + oneWeekLater);
+    const newRegDeadline = event.registrationDeadline 
+      ? new Date(event.registrationDeadline.getTime() + oneWeekLater)
+      : new Date(newStartDate.getTime() - 24 * 60 * 60 * 1000);
 
     await db.insert(events).values({
       id: newEventId,
@@ -497,17 +473,7 @@ export async function duplicateEvent(eventId: string, newName: string) {
       eventType: event.eventType,
       registrationDeadline: newRegDeadline,
       isActive: false, // New events start inactive
-      tags: event.tags,
-      organizerEmail: event.organizerEmail,
-      organizerPhone: event.organizerPhone,
-      websiteUrl: event.websiteUrl,
-      logoUrl: event.logoUrl,
-      requirements: event.requirements,
-      ticketPrice: event.ticketPrice,
-      currency: event.currency,
       createdBy: session.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
     // Copy checkpoints

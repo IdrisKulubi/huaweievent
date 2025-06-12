@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Video, Star } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, Star } from "lucide-react";
 import { format } from "date-fns";
 
 interface SlotData {
@@ -91,7 +91,7 @@ export function UpcomingSlots({ slots, employerId }: UpcomingSlotsProps) {
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                📅 Today's Interview Schedule
+                📅 Today&apos;s Interview Schedule
               </CardTitle>
               <p className="text-base text-gray-700 mt-1 font-medium">
                 {slots.length} {slots.length === 1 ? 'slot' : 'slots'} scheduled • {slots.filter(s => s.booking).length} booked

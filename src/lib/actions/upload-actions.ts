@@ -36,7 +36,20 @@ const allowedMimeTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
 
+const allowedAdditionalDocumentTypes = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'text/plain',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+];
+
 const maxFileSize = 5 * 1024 * 1024; // 5MB
+const maxAdditionalDocumentSize = 10 * 1024 * 1024; // 10MB for additional documents
 
 export async function uploadCVToR2(file: File) {
   try {
@@ -102,6 +115,73 @@ export async function uploadCVToR2(file: File) {
     return {
       success: false,
       error: "Failed to upload CV. Please try again.",
+    };
+  }
+}
+
+export async function uploadAdditionalDocumentToR2(file: File) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    // Validate file
+    if (!allowedAdditionalDocumentTypes.includes(file.type)) {
+      return {
+        success: false,
+        error: "Invalid file type. Please upload a supported document type (PDF, DOC, DOCX, JPG, PNG, GIF, TXT, XLS, XLSX).",
+      };
+    }
+
+    if (file.size > maxAdditionalDocumentSize) {
+      return {
+        success: false,
+        error: "File size too large. Maximum size is 10MB.",
+      };
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2);
+    const fileExtension = file.name.split('.').pop();
+    const fileName = `additional-docs/${session.user.id}/${timestamp}-${randomSuffix}.${fileExtension}`;
+
+    // Convert File to Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Upload to R2
+    const uploadCommand = new PutObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: fileName,
+      Body: buffer,
+      ContentType: file.type,
+      ContentLength: file.size,
+      Metadata: {
+        userId: session.user.id,
+        originalName: file.name,
+        uploadedAt: new Date().toISOString(),
+        documentType: 'additional',
+      },
+    });
+
+    await r2Client.send(uploadCommand);
+
+    return {
+      success: true,
+      url: fileName, // Store the file key, not the full URL
+      fileName: fileName,
+      originalName: file.name,
+      size: file.size,
+      type: file.type,
+    };
+
+  } catch (error) {
+    console.error("Error uploading additional document to R2:", error);
+    return {
+      success: false,
+      error: "Failed to upload document. Please try again.",
     };
   }
 }

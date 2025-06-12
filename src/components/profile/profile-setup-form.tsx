@@ -12,10 +12,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, Upload, User, Briefcase, GraduationCap, Clock, Phone, Mail, FileText, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { AlertCircle, User, Briefcase, GraduationCap, Clock, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { createJobSeekerProfile } from "@/lib/actions/user-actions";
 import { toast } from "sonner";
-import { CVUploadField } from "@/components/profile/cv-upload-field";
+import { CVUploadField } from "./cv-upload-field";
+import { AdditionalDocumentsUpload } from "./additional-documents-upload";
 
 // Job sectors/categories from employer side
 const JOB_SECTORS = [
@@ -86,12 +87,23 @@ interface ProfileSetupFormProps {
   };
 }
 
+interface AdditionalDocument {
+  id: string;
+  name: string;
+  url: string;
+  uploadKey: string;
+  uploadedAt: string;
+  fileSize?: number;
+  fileType?: string;
+}
+
 export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [cvUploadUrl, setCvUploadUrl] = useState<string>("");
+  const [additionalDocuments, setAdditionalDocuments] = useState<AdditionalDocument[]>([]);
 
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
@@ -149,7 +161,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!cvUploadUrl && !cvFile) {
+    if (!cvUploadUrl) {
       toast.error("Please upload your CV before submitting");
       return;
     }
@@ -160,13 +172,22 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
       const skillsArray = data.skills.split(",").map(skill => skill.trim()).filter(Boolean);
       
       const profileData = {
-        ...data,
         userId: user.id!,
-        cvUrl: cvUploadUrl,
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+        bio: data.bio,
+        interestCategories: selectedSectors,
+        educationLevel: data.educationLevel,
+        experienceLevel: data.experienceLevel,
         skills: skillsArray,
-        interestCategories: data.jobSectors,
-        // Ensure expectedSalary is properly set
-        expectedSalary: data.expectedSalary?.trim() || undefined,
+        linkedinUrl: data.linkedinUrl || "",
+        portfolioUrl: data.portfolioUrl || "",
+        expectedSalary: data.expectedSalary || "",
+        availableFrom: data.availableFrom,
+        cvUrl: cvUploadUrl,
+        cvUploadKey: cvUploadUrl,
+        additionalDocuments: additionalDocuments,
+        jobSectors: selectedSectors,
       };
 
       // Debug: Log the data being sent
@@ -175,11 +196,12 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
         expectedSalary: profileData.expectedSalary,
         skillsType: typeof profileData.skills,
         expectedSalaryType: typeof profileData.expectedSalary,
+
       });
 
       await createJobSeekerProfile(profileData);
       
-      toast.success("Registration completed! Our team will review your application and assign interview slots. You'll receive notifications with your booth assignment details.");
+      toast.success("Registration completed! Our team will review your application and match you with suitable companies. You'll receive notifications with your interview schedule and booth assignment details for the Nation-Huawei Leap Job Fair.");
       
       // Redirect to dashboard or success page
       window.location.href = "/dashboard";
@@ -341,8 +363,8 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                     <SelectContent>
                       <SelectItem value="High School">High School / Secondary School</SelectItem>
                       <SelectItem value="Diploma">Diploma</SelectItem>
-                      <SelectItem value="Bachelor's Degree">Bachelor's Degree</SelectItem>
-                      <SelectItem value="Master's Degree">Master's Degree</SelectItem>
+                      <SelectItem value="Bachelor's Degree">Bachelor&apos;s Degree</SelectItem>
+                      <SelectItem value="Master's Degree">Master&apos;s Degree</SelectItem>
                       <SelectItem value="PhD">PhD</SelectItem>
                       <SelectItem value="Vocational/Technical">Vocational/Technical Certificate</SelectItem>
                       <SelectItem value="Other">Other</SelectItem>
@@ -404,6 +426,21 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   onFileSelect={setCvFile}
                   onUploadComplete={setCvUploadUrl}
                   currentFile={cvFile}
+                />
+                {!cvUploadUrl && (
+                  <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                    <AlertCircle className="w-4 h-4" />
+                    Please upload your CV to continue
+                  </p>
+                )}
+              </div>
+
+              {/* Additional Documents Upload */}
+              <div className="space-y-2">
+                <AdditionalDocumentsUpload
+                  onDocumentsChange={setAdditionalDocuments}
+                  currentDocuments={additionalDocuments}
+                  maxDocuments={5}
                 />
               </div>
 
@@ -479,7 +516,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">What Happens Next?</h5>
                       <p className="text-sm text-blue-700 dark:text-blue-300">
                         Once you submit your profile, our team will carefully review it. We will then match you with suitable companies and assign you an interview time. 
-                        You'll receive an email and SMS with all the details. Good luck!
+                        You&apos;ll receive an email and SMS with all the details. Good luck!
                       </p>
                     </div>
                   </div>

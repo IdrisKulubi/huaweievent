@@ -188,7 +188,7 @@ export default async function EmployerDashboard() {
                     👑 Admin Access Mode
                   </h3>
                   <p className="text-orange-800 mb-4 text-lg">
-                    You're viewing the employer portal as an administrator. This gives you access to all employer features for oversight and support purposes.
+                    You&apos;re viewing the employer portal as an administrator. This gives you access to all employer features for oversight and support purposes.
                   </p>
                   <div className="flex gap-4">
                     <a 

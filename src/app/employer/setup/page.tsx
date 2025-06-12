@@ -49,7 +49,7 @@ export default async function EmployerSetupPage() {
                 Welcome to the Job Fair Platform
               </h1>
               <p className="text-gray-600 text-lg">
-                Let's set up your company profile to get started
+                Let&apos;s set up your company profile to get started
               </p>
             </div>
           </div>

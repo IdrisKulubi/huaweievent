@@ -276,7 +276,7 @@ export function AdminBoothModal({ events, trigger }: AdminBoothModalProps) {
                 <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-xs text-blue-800">
                     <strong>💡 Tip:</strong> You can find employer emails in the Admin → User Management → Employers section. 
-                    If the company isn't registered yet, ask them to sign up first at the employer registration page.
+                    If the company isn&apos;t registered yet, ask them to sign up first at the employer registration page.
                   </p>
                 </div>
               </div>

@@ -15,6 +15,13 @@
       "when": 1749673842200,
       "tag": "0001_bored_marvel_apes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749676643942,
+      "tag": "0002_faulty_shen",
+      "breakpoints": true
     }
   ]
 }
