@@ -93,7 +93,7 @@ export function generateQRCodeData(ticketNumber: string, pin: string): string {
     ticketNumber,
     pin,
     timestamp,
-    event: "HCS2024",
+    event: "HCS2025",
   };
   
   return JSON.stringify(data);
@@ -117,7 +117,7 @@ export function validateQRCodeData(qrData: string): {
       };
     }
     
-    if (parsed.event !== "HCS2024") {
+    if (parsed.event !== "HCS2025") {
       return {
         valid: false,
         error: "Invalid event code",

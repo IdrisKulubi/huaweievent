@@ -104,12 +104,12 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
  */
 export async function sendWelcomeSMS(data: WelcomeSMSData): Promise<boolean> {
   try {
-    const smsContent = `🎉 Welcome ${data.name}! You're registered for Huawei Career Summit 2024.
+    const smsContent = `🎉 Welcome ${data.name}! You're registered for Nation-Huawei Leap Job Fair 2025.
 
 🎫 Ticket: ${data.ticketNumber}
 🔐 PIN: ${data.pin}
 
-📅 Dec 15-16, 2024 at KICC, Nairobi
+📅 Jun 26-27, 2025 at UON Grounds, Nairobi
 Keep this PIN safe for check-in!
 
 Support: +254 700 000 000 🚀`;
@@ -146,13 +146,13 @@ export async function sendPinReminderEmail(email: string, name: string, pin: str
     const emailContent = `
       Dear ${name},
 
-      This is a reminder of your PIN code for the Huawei Career Summit 2024.
+      This is a reminder of your PIN code for the Nation-Huawei Leap Job Fair 2025.
 
       🎫 Ticket Number: ${ticketNumber}
       🔐 PIN Code: ${pin}
 
-      📅 Event: December 15-16, 2024
-      📍 Venue: KICC, Nairobi
+      📅 Jun 26-27, 2025 at UON Grounds, Nairobi
+      📍 Venue: UON Grounds, Nairobi
 
       Please keep this information secure and bring it with you to the event.
 
@@ -177,12 +177,12 @@ export async function sendPinReminderEmail(email: string, name: string, pin: str
  */
 export async function sendPinReminderSMS(phoneNumber: string, name: string, pin: string, ticketNumber: string): Promise<boolean> {
   try {
-    const smsContent = `Hi ${name}! 📱 Reminder for Huawei Career Summit 2024:
+    const smsContent = `Hi ${name}! 📱 Reminder for Nation-Huawei Leap Job Fair 2025:
 
 🎫 Ticket: ${ticketNumber}
 🔐 PIN: ${pin}
 
-📅 Dec 15-16 at KICC, Nairobi
+📅 Jun 26-27 at UON Grounds, Nairobi
 Keep this safe for check-in! 🎯`;
 
     const result = await sendSMS({

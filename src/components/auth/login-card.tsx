@@ -63,12 +63,12 @@ export function LoginCard() {
           <div className="grid grid-cols-2 gap-3 my-6">
             <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
               <Calendar className="w-4 h-4 text-[var(--huawei-red)] mx-auto mb-1" />
-              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Dec 15-16</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400">2024</p>
+              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">Jun 26-27</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">2025</p>
             </div>
             <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
               <MapPin className="w-4 h-4 text-blue-600 mx-auto mb-1" />
-              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">KICC</p>
+              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">UON Grounds</p>
               <p className="text-xs text-slate-600 dark:text-slate-400">Nairobi</p>
             </div>
           </div>

@@ -315,7 +315,7 @@ export function CreateEventModal({ trigger, defaultType }: CreateEventModalProps
                   </Label>
                   <Input
                     id="venue"
-                    placeholder="e.g., Kenyatta International Convention Centre"
+                    placeholder="e.g., University of Nairobi Grounds"
                     value={formData.venue}
                     onChange={(e) => handleInputChange("venue", e.target.value)}
                     className="mt-1"

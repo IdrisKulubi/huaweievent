@@ -169,7 +169,7 @@ export function PinVerificationForm({ securityId }: PinVerificationFormProps) {
             <Input
               id="ticket-input"
               type="text"
-              placeholder="HCS-2024-12345678"
+              placeholder="HCS-2025-12345678"
               value={ticketInput}
               onChange={(e) => setTicketInput(e.target.value.toUpperCase())}
               className="h-12 text-base border-2 border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-900 placeholder:text-gray-500"

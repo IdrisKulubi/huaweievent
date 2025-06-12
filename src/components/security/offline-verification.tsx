@@ -322,7 +322,7 @@ export function OfflineVerificationInterface({ securityId, badgeNumber }: Offlin
                 <Input
                   id="ticket-input"
                   type="text"
-                    placeholder="HCS-2024-12345678"
+                    placeholder="HCS-2025-12345678"
                   value={ticketInput}
                   onChange={(e) => setTicketInput(e.target.value.toUpperCase())}
                     className="h-14 text-lg border-3 border-gray-300 hover:border-purple-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-200 bg-white text-gray-900 placeholder:text-gray-500 rounded-xl shadow-sm transition-all duration-200"

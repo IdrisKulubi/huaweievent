@@ -125,7 +125,7 @@ export default async function DashboardPage() {
                       <Calendar className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-800 dark:text-slate-200">December 15-16, 2024</p>
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">June 26-27, 2025</p>
                       <p className="text-sm text-orange-600 dark:text-orange-400">Two Days</p>
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
                       <MapPin className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-slate-800 dark:text-slate-200">KICC, Nairobi</p>
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">UON Grounds, Nairobi</p>
                       <p className="text-sm text-blue-600 dark:text-blue-400">Registration: 8:00 AM</p>
                     </div>
                   </div>

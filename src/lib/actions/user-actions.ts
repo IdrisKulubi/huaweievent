@@ -137,8 +137,8 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
         ticketNumber: ticketNumber,
         eventDetails: {
           name: "Huawei Career Summit",
-          date: "May 15-16, 2025",
-          venue: "KICC, Nairobi",
+          date: "June 26-27, 2025",
+          venue: "UON Grounds, Nairobi",
         }
       });
 
@@ -327,8 +327,8 @@ export async function regeneratePin(userId: string) {
         ticketNumber: userProfile.jobSeeker?.ticketNumber || "",
         eventDetails: {
           name: "Huawei Career Summit",
-          date: "December 15-16, 2024",
-          venue: "KICC, Nairobi",
+          date: "June 26-27, 2025",
+          venue: "UON Grounds, Nairobi",
         }
       });
 

@@ -99,7 +99,7 @@ export function UserAccount() {
         
         <DropdownMenuItem asChild>
           <Link 
-            href="/dashboard/profile" 
+            href="/dashboard" 
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
           >
             <User className="w-4 h-4" />
@@ -109,7 +109,7 @@ export function UserAccount() {
         
         <DropdownMenuItem asChild>
           <Link 
-            href="/dashboard/settings" 
+            href="/dashboard" 
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
           >
             <Settings className="w-4 h-4" />

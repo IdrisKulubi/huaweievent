@@ -221,8 +221,8 @@ export async function setupHuaweiJobFair2025() {
     name: "Huawei Nation Job Fair 2025",
     startDate: "2025-06-05",
     endDate: "2025-06-06", 
-    venue: "Kenyatta International Conference Centre (KICC)",
-    address: "Harambee Avenue, Nairobi, Kenya",
+    venue: "University of Nairobi Grounds",
+    address: "University Way, Nairobi, Kenya",
     maxAttendees: 5000,
     maxEmployers: 70
   };
