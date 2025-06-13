@@ -6,7 +6,7 @@ import {
   systemLogs,
   events
 } from "@/db/schema";
-import { eq, count, sql, desc, gte } from "drizzle-orm";
+import { eq, count, sql, desc, gte, and } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -256,12 +256,7 @@ export default async function SystemReportsPage() {
                       </div>
                     </div>
                   </div>
-                  {data.usage && (
-                    <div className="mt-2">
-                      <Progress value={data.usage} className="h-1" />
-                      <div className="text-xs text-slate-600 mt-1">{data.usage}% usage</div>
-                    </div>
-                  )}
+                 
                 </CardContent>
               </Card>
             );

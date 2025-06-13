@@ -67,7 +67,7 @@ export function HeroSection() {
                 <MapPin className="w-5 h-5 text-[var(--nation-blue)]" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Venue</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">UON Grounds, Nairobi</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">University of Nairobi Graduation Square</p>
                 </div>
               </div>
               
