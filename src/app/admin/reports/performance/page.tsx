@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Download,
   TrendingUp,
   Target,
   Users,
@@ -27,8 +26,12 @@ import {
   Award,
   BarChart3,
   Activity,
-  CheckCircle
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertTriangle
 } from "lucide-react";
+import { ExportButton } from "@/components/admin/export-button";
 
 export default async function EventPerformancePage() {
   const session = await auth();
@@ -256,21 +259,11 @@ export default async function EventPerformancePage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white shadow-lg"
-              onClick={() => {
-                const dataStr = JSON.stringify(exportData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `event-performance-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-              }}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </Button>
+            <ExportButton 
+              data={exportData}
+              filename={`event-performance-${new Date().toISOString().split('T')[0]}.json`}
+              label="Export Report"
+            />
             <Badge variant="outline" className="px-3 py-1">
               <Calendar className="h-4 w-4 mr-2" />
               Overall Performance

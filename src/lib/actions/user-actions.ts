@@ -31,6 +31,16 @@ interface CreateJobSeekerProfileData {
     fileSize?: number;
     fileType?: string;
   }>;
+  // Huawei student fields
+  isHuaweiStudent?: boolean;
+  huaweiStudentId?: string;
+  huaweiCertificationLevel?: string;
+  huaweiCertificationDetails?: string;
+  // Conference fields
+  wantsToAttendConference?: boolean;
+  conferenceSessionInterests?: string[];
+  conferenceDietaryRequirements?: string;
+  conferenceAccessibilityNeeds?: string;
 }
 
 export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
@@ -121,6 +131,21 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
           availableFrom: new Date(data.availableFrom),
           pinGeneratedAt: new Date(),
           pinExpiresAt: pinExpirationTime,
+          // Huawei student fields
+          isHuaweiStudent: data.isHuaweiStudent || false,
+          huaweiStudentId: data.huaweiStudentId || null,
+          huaweiCertificationLevel: data.huaweiCertificationLevel || null,
+          huaweiCertificationDetails: data.huaweiCertificationDetails ? 
+            [{ details: data.huaweiCertificationDetails, addedAt: new Date().toISOString() }] : null,
+          // Conference fields
+          wantsToAttendConference: data.wantsToAttendConference || false,
+          conferenceRegistrationDate: data.wantsToAttendConference ? new Date() : null,
+          conferenceAttendanceStatus: data.wantsToAttendConference ? "registered" : null,
+          conferencePreferences: data.wantsToAttendConference ? {
+            sessionInterests: data.conferenceSessionInterests || [],
+            dietaryRequirements: data.conferenceDietaryRequirements || "",
+            accessibilityNeeds: data.conferenceAccessibilityNeeds || ""
+          } : null,
           createdAt: new Date(),
           updatedAt: new Date(),
         });

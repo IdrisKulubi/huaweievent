@@ -29,7 +29,8 @@ import {
   TrendingUp,
   Zap,
   Plus,
-  UserCheck
+  UserCheck,
+  GraduationCap
 } from "lucide-react";
 
 interface NavigationSubItem {
@@ -84,6 +85,15 @@ const navigationItems: NavigationItem[] = [
       { title: "Employers", href: "/admin/users/employers", icon: Building },
       { title: "Job Seekers", href: "/admin/users/jobseekers", icon: UserCheck },
       { title: "Role Management", href: "/admin/users/roles", icon: UserCog },
+    ],
+  },
+  {
+    title: "Huawei Students & Conference",
+    icon: GraduationCap,
+    items: [
+      { title: "Huawei Students", href: "/admin/huawei-students", icon: GraduationCap },
+      { title: "Conference Management", href: "/admin/conference", icon: Calendar },
+      { title: "Certification Tracking", href: "/admin/certifications", icon: Shield },
     ],
   },
   // {

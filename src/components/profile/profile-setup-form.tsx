@@ -63,6 +63,13 @@ const EXPERIENCE_LEVELS = [
   "10+ years"
 ];
 
+const HUAWEI_CERTIFICATION_LEVELS = [
+  "HCIA",
+  "HCIP", 
+  "HCIE",
+  "other"
+];
+
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
@@ -75,6 +82,16 @@ const profileSchema = z.object({
   portfolioUrl: z.string().url("Please enter a valid portfolio URL").optional().or(z.literal("")),
   expectedSalary: z.string().optional(),
   availableFrom: z.string().min(1, "Please select when you're available to start"),
+  // Huawei student fields
+  isHuaweiStudent: z.boolean(),
+  huaweiStudentId: z.string().optional(),
+  huaweiCertificationLevel: z.string().optional(),
+  huaweiCertificationDetails: z.string().optional(),
+  // Conference fields
+  wantsToAttendConference: z.boolean(),
+  conferenceSessionInterests: z.array(z.string()).optional(),
+  conferenceDietaryRequirements: z.string().optional(),
+  conferenceAccessibilityNeeds: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -104,8 +121,9 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [cvUploadUrl, setCvUploadUrl] = useState<string>("");
   const [additionalDocuments, setAdditionalDocuments] = useState<AdditionalDocument[]>([]);
+  const [conferenceSessionInterests, setConferenceSessionInterests] = useState<string[]>([]);
 
-  const totalSteps = 3;
+  const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
   const {
@@ -117,9 +135,13 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
     trigger
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
+    
     defaultValues: {
       fullName: user.name || "",
       jobSectors: [],
+      isHuaweiStudent: false,
+      wantsToAttendConference: false,
+      conferenceSessionInterests: [],
     },
     mode: "onChange"
   });
@@ -144,11 +166,22 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
         fieldsToValidate = ["bio", "jobSectors"];
         break;
       case 3:
-        fieldsToValidate = ["educationLevel", "experienceLevel", "skills", "availableFrom"];
+        fieldsToValidate = ["educationLevel", "experienceLevel", "skills"];
+        break;
+      case 4:
+        // Step 4 has required fields but they're handled by conditional validation
+        fieldsToValidate = ["availableFrom"];
         break;
     }
     
     const isValid = await trigger(fieldsToValidate);
+    
+    // Additional validation for step 3 - ensure CV is uploaded
+    if (currentStep === 3 && !cvUploadUrl) {
+      toast.error("Please upload your CV before proceeding to the next step");
+      return;
+    }
+    
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -160,7 +193,32 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
     }
   };
 
-  const onSubmit = async (data: ProfileFormData) => {
+  // Prevent any accidental form submissions on steps 1-3
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (currentStep < totalSteps) {
+      toast.info(`Please use the "Next Step" button to continue. You're on step ${currentStep} of ${totalSteps}.`);
+      return;
+    }
+    // Only proceed with actual submission on step 4
+    onSubmit(e as React.FormEvent<HTMLFormElement>);
+  };
+
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    
+    // Only allow submission on step 4 (final step)
+    if (currentStep !== totalSteps) {
+      console.log(`🚫 Form submission blocked - currently on step ${currentStep}, need to be on step ${totalSteps}`);
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries()) as any;
+    
+    // Get form values using watch
+    const formValues = watch();
+    
     if (!cvUploadUrl) {
       toast.error("Please upload your CV before submitting");
       return;
@@ -169,25 +227,33 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
     setIsSubmitting(true);
     
     try {
-      const skillsArray = data.skills.split(",").map(skill => skill.trim()).filter(Boolean);
+      const skillsArray = formValues.skills.split(",").map(skill => skill.trim()).filter(Boolean);
       
       const profileData = {
         userId: user.id!,
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-        bio: data.bio,
+        fullName: formValues.fullName,
+        phoneNumber: formValues.phoneNumber,
+        bio: formValues.bio,
         interestCategories: selectedSectors,
-        educationLevel: data.educationLevel,
-        experienceLevel: data.experienceLevel,
+        educationLevel: formValues.educationLevel,
+        experienceLevel: formValues.experienceLevel,
         skills: skillsArray,
-        linkedinUrl: data.linkedinUrl || "",
-        portfolioUrl: data.portfolioUrl || "",
-        expectedSalary: data.expectedSalary || "",
-        availableFrom: data.availableFrom,
+        linkedinUrl: formValues.linkedinUrl || "",
+        portfolioUrl: formValues.portfolioUrl || "",
+        expectedSalary: formValues.expectedSalary || "",
+        availableFrom: formValues.availableFrom,
         cvUrl: cvUploadUrl,
         cvUploadKey: cvUploadUrl,
         additionalDocuments: additionalDocuments,
         jobSectors: selectedSectors,
+        isHuaweiStudent: formValues.isHuaweiStudent || false,
+        huaweiStudentId: formValues.huaweiStudentId || "",
+        huaweiCertificationLevel: formValues.huaweiCertificationLevel || "",
+        huaweiCertificationDetails: formValues.huaweiCertificationDetails || "",
+        wantsToAttendConference: formValues.wantsToAttendConference || false,
+        conferenceSessionInterests: conferenceSessionInterests,
+        conferenceDietaryRequirements: formValues.conferenceDietaryRequirements || "",
+        conferenceAccessibilityNeeds: formValues.conferenceAccessibilityNeeds || "",
       };
 
       // Debug: Log the data being sent
@@ -196,7 +262,6 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
         expectedSalary: profileData.expectedSalary,
         skillsType: typeof profileData.skills,
         expectedSalaryType: typeof profileData.expectedSalary,
-
       });
 
       await createJobSeekerProfile(profileData);
@@ -444,9 +509,201 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                 />
               </div>
 
+              {/* Assignment Notice */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-xl border border-blue-200/50 dark:border-blue-800/30">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Almost Done!</h5>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Great progress! Next, you'll share your Huawei student status and conference preferences, plus your availability details.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 4:
+        return (
+          <Card className="border-t-4 border-t-pink-500 shadow-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-lg">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-3">
+                  <User className="w-6 h-6 text-pink-600" />
+                  <h3 className="text-xl font-semibold">Step 4: Huawei Student and Conference</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-normal">Share your Huawei student and conference information</p>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="isHuaweiStudent" className="text-slate-700 dark:text-slate-300 font-medium">Are you a Huawei student? *</Label>
+                <Select onValueChange={(value) => setValue("isHuaweiStudent", value === "true")}>
+                  <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20">
+                    <SelectValue placeholder="Select your status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Yes</SelectItem>
+                    <SelectItem value="false">No</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.isHuaweiStudent && (
+                  <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.isHuaweiStudent.message}
+                  </p>
+                )}
+              </div>
+
+              {watch("isHuaweiStudent") && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="huaweiStudentId" className="text-slate-700 dark:text-slate-300 font-medium">Huawei Student ID *</Label>
+                    <Input
+                      id="huaweiStudentId"
+                      {...register("huaweiStudentId")}
+                      placeholder="e.g., 12345678"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200"
+                    />
+                    {errors.huaweiStudentId && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.huaweiStudentId.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="huaweiCertificationLevel" className="text-slate-700 dark:text-slate-300 font-medium">Huawei Certification Level *</Label>
+                    <Select onValueChange={(value) => setValue("huaweiCertificationLevel", value)}>
+                      <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20">
+                        <SelectValue placeholder="Select your certification level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {HUAWEI_CERTIFICATION_LEVELS.map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {level.charAt(0).toUpperCase() + level.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.huaweiCertificationLevel && (
+                      <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.huaweiCertificationLevel.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="huaweiCertificationDetails" className="text-slate-700 dark:text-slate-300 font-medium">Huawei Certification Details (Optional)</Label>
+                    <Textarea
+                      id="huaweiCertificationDetails"
+                      {...register("huaweiCertificationDetails")}
+                      placeholder="Enter any additional details about your Huawei certification"
+                      className="mt-1 min-h-[120px] bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200 resize-none"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="wantsToAttendConference" className="text-slate-700 dark:text-slate-300 font-medium">Do you want to attend the conference? *</Label>
+                <Select onValueChange={(value) => setValue("wantsToAttendConference", value === "true")}>
+                  <SelectTrigger className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20">
+                    <SelectValue placeholder="Select your status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Yes</SelectItem>
+                    <SelectItem value="false">No</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.wantsToAttendConference && (
+                  <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.wantsToAttendConference.message}
+                  </p>
+                )}
+              </div>
+
+              {watch("wantsToAttendConference") && (
+                <>
+                  <div className="space-y-3">
+                    <Label className="text-slate-700 dark:text-slate-300 font-medium">Conference Session Interests (Optional)</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {[
+                        "Technology & Innovation",
+                        "Career Development", 
+                        "Networking Sessions",
+                        "Industry Insights",
+                        "Skills Development",
+                        "Leadership & Management",
+                        "Entrepreneurship",
+                        "Digital Transformation"
+                      ].map((interest, index) => (
+                        <Badge
+                          key={interest}
+                          variant={conferenceSessionInterests.includes(interest) ? "default" : "outline"}
+                          className={`cursor-pointer p-3 text-center justify-center transition-all duration-200 hover:scale-105 ${
+                            conferenceSessionInterests.includes(interest)
+                              ? `bg-gradient-to-r ${
+                                  index % 4 === 0 ? 'from-pink-500 to-rose-600' :
+                                  index % 4 === 1 ? 'from-purple-500 to-indigo-600' :
+                                  index % 4 === 2 ? 'from-blue-500 to-cyan-600' :
+                                  'from-green-500 to-emerald-600'
+                                } text-white shadow-lg border-0`
+                              : "hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-600"
+                          }`}
+                          onClick={() => {
+                            const newInterests = conferenceSessionInterests.includes(interest)
+                              ? conferenceSessionInterests.filter(i => i !== interest)
+                              : [...conferenceSessionInterests, interest];
+                            setConferenceSessionInterests(newInterests);
+                          }}
+                        >
+                          {interest}
+                        </Badge>
+                      ))}
+                    </div>
+                    {conferenceSessionInterests.length > 0 && (
+                      <div className="bg-pink-50 dark:bg-pink-950/20 p-3 rounded-lg">
+                        <p className="text-sm text-pink-700 dark:text-pink-300 flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4" />
+                          {conferenceSessionInterests.length} session{conferenceSessionInterests.length > 1 ? 's' : ''} selected
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="conferenceDietaryRequirements" className="text-slate-700 dark:text-slate-300 font-medium">Conference Dietary Requirements (Optional)</Label>
+                    <Textarea
+                      id="conferenceDietaryRequirements"
+                      {...register("conferenceDietaryRequirements")}
+                      placeholder="e.g., Vegetarian, Halal, No nuts, etc. Leave blank if none"
+                      className="mt-1 min-h-[80px] bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200 resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="conferenceAccessibilityNeeds" className="text-slate-700 dark:text-slate-300 font-medium">Conference Accessibility Needs (Optional)</Label>
+                    <Textarea
+                      id="conferenceAccessibilityNeeds"
+                      {...register("conferenceAccessibilityNeeds")}
+                      placeholder="e.g., Wheelchair access, Sign language interpreter, etc. Leave blank if none"
+                      className="mt-1 min-h-[80px] bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200 resize-none"
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-purple-600" />
+                  <Clock className="w-5 h-5 text-pink-600" />
                   Your Availability & Links
                 </h4>
               
@@ -457,7 +714,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       id="availableFrom"
                       type="date"
                       {...register("availableFrom")}
-                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200"
                     />
                     {errors.availableFrom && (
                       <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
@@ -473,7 +730,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       id="expectedSalary"
                       {...register("expectedSalary")}
                       placeholder="e.g., KES 50,000"
-                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -485,7 +742,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       id="linkedinUrl"
                       {...register("linkedinUrl")}
                       placeholder="https://linkedin.com/in/your-profile"
-                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200"
                     />
                      {errors.linkedinUrl && (
                       <p className="text-red-500 text-sm mt-2 flex items-center gap-2 bg-red-50 dark:bg-red-950/20 p-2 rounded-lg">
@@ -501,20 +758,20 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                       id="portfolioUrl"
                       {...register("portfolioUrl")}
                       placeholder="https://your-portfolio-website.com"
-                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-200"
+                      className="mt-1 h-12 bg-white/70 dark:bg-slate-800/70 border-slate-200 dark:border-slate-600 focus:border-pink-500 focus:ring-pink-500/20 transition-all duration-200"
                     />
                   </div>
                 </div>
 
                 {/* Assignment Notice */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-xl border border-blue-200/50 dark:border-blue-800/30">
+                <div className="bg-gradient-to-r from-pink-50 to-pink-950/20 p-4 rounded-xl border border-pink-200/50 dark:border-pink-800/30">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <div className="w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                     </div>
                     <div>
-                      <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">What Happens Next?</h5>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                      <h5 className="font-semibold text-pink-900 dark:text-pink-100 mb-1">What Happens Next?</h5>
+                      <p className="text-sm text-pink-700 dark:text-pink-300">
                         Once you submit your profile, our team will carefully review it. We will then match you with suitable companies and assign you an interview time. 
                         You&apos;ll receive an email and SMS with all the details. Good luck!
                       </p>
@@ -558,7 +815,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
 
         {/* Step Indicators */}
         <div className="flex justify-between items-center mt-4">
-          {[1, 2, 3].map((step) => (
+          {[1, 2, 3, 4].map((step) => (
             <div key={step} className="flex items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                 step <= currentStep 
@@ -571,7 +828,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   <span className="font-semibold">{step}</span>
                 )}
               </div>
-              {step < 4 && (
+              {step < 5 && (
                 <div className={`w-full h-1 mx-2 transition-all duration-300 ${
                   step < currentStep ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-slate-200 dark:bg-slate-700'
                 }`} />
@@ -582,8 +839,27 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {renderStep()}
+      <div 
+        className="space-y-8"
+        onKeyDown={(e) => {
+          // Prevent Enter key submission on steps 1-3
+          if (e.key === 'Enter' && currentStep < totalSteps) {
+            e.preventDefault();
+            nextStep();
+          }
+        }}
+      >
+     
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (currentStep < totalSteps) {
+                toast.info(`Please use the "Next Step" button to continue to step ${currentStep + 1}.`);
+              }
+            }}
+          >
+            {renderStep()}
+          </form>
 
         {/* Enhanced Navigation Buttons */}
         <div className="flex justify-between items-center pt-8">
@@ -608,26 +884,28 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
-            <Button
-              type="submit"
-              disabled={isSubmitting || !cvUploadUrl}
-              className="px-8 py-3 h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Creating Profile...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Complete Profile
-                </>
-              )}
-            </Button>
+            <form onSubmit={handleFormSubmit}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !cvUploadUrl}
+                className="px-8 py-3 h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Creating Profile...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Complete Profile
+                  </>
+                )}
+              </Button>
+            </form>
           )}
         </div>
-      </form>
+      </div>
     </div>
   );
 } 

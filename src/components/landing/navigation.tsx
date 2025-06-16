@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 const navigationLinks = [
   { name: "About", href: "#about", icon: Info },
   { name: "Schedule", href: "#schedule", icon: Calendar },
-  { name: "Features", href: "#features", icon: Users },
+  { name: "Conference", href: "#conference", icon: Users },
   { name: "Contact", href: "#contact", icon: Phone }
 ];
 
