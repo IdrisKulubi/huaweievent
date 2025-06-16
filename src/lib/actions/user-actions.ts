@@ -138,7 +138,7 @@ export async function createJobSeekerProfile(data: CreateJobSeekerProfileData) {
         eventDetails: {
           name: "Huawei Career Summit",
           date: "June 26-27, 2025",
-          venue: "UON Grounds, Nairobi",
+          venue: "UON Graduation Square, Nairobi",
         }
       });
 
@@ -328,7 +328,7 @@ export async function regeneratePin(userId: string) {
         eventDetails: {
           name: "Huawei Career Summit",
           date: "June 26-27, 2025",
-          venue: "UON Grounds, Nairobi",
+          venue: "UON Graduation Square, Nairobi",
         }
       });
 

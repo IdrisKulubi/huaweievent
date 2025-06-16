@@ -30,6 +30,23 @@ CREATE TABLE "attendance_record" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "booth_assignment" (
+	"id" text PRIMARY KEY NOT NULL,
+	"job_seeker_id" text NOT NULL,
+	"booth_id" text NOT NULL,
+	"interview_slot_id" text,
+	"assigned_by" text NOT NULL,
+	"assigned_at" timestamp DEFAULT now() NOT NULL,
+	"status" text DEFAULT 'assigned',
+	"interview_date" timestamp,
+	"interview_time" text,
+	"notes" text,
+	"priority" text DEFAULT 'medium',
+	"notification_sent" boolean DEFAULT false,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "booth" (
 	"id" text PRIMARY KEY NOT NULL,
 	"event_id" text NOT NULL,
@@ -40,6 +57,26 @@ CREATE TABLE "booth" (
 	"equipment" json,
 	"special_requirements" text,
 	"is_active" boolean DEFAULT true,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "bulk_notification" (
+	"id" text PRIMARY KEY NOT NULL,
+	"campaign_name" text NOT NULL,
+	"notification_type" text NOT NULL,
+	"template_type" text NOT NULL,
+	"subject" text,
+	"message" text NOT NULL,
+	"recipient_count" integer NOT NULL,
+	"sent_count" integer DEFAULT 0,
+	"failed_count" integer DEFAULT 0,
+	"status" text DEFAULT 'draft',
+	"scheduled_at" timestamp,
+	"started_at" timestamp,
+	"completed_at" timestamp,
+	"created_by" text NOT NULL,
+	"metadata" json,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -102,6 +139,14 @@ CREATE TABLE "event" (
 	"registration_deadline" timestamp,
 	"is_active" boolean DEFAULT true,
 	"event_type" text DEFAULT 'job_fair',
+	"has_conference" boolean DEFAULT false,
+	"conference_start_date" timestamp,
+	"conference_end_date" timestamp,
+	"conference_venue" text,
+	"conference_max_attendees" integer,
+	"conference_registration_deadline" timestamp,
+	"conference_description" text,
+	"conference_sessions" json,
 	"created_by" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -169,6 +214,7 @@ CREATE TABLE "job_seeker" (
 	"user_id" text NOT NULL,
 	"bio" text,
 	"cv_url" text,
+	"additional_documents" json,
 	"skills" json,
 	"experience" text,
 	"education" text,
@@ -182,6 +228,16 @@ CREATE TABLE "job_seeker" (
 	"available_from" timestamp,
 	"pin_generated_at" timestamp,
 	"pin_expires_at" timestamp,
+	"assignment_status" text DEFAULT 'unassigned',
+	"priority_level" text DEFAULT 'normal',
+	"is_huawei_student" boolean DEFAULT false,
+	"huawei_certification_level" text,
+	"huawei_certification_details" json,
+	"huawei_student_id" text,
+	"wants_to_attend_conference" boolean DEFAULT false,
+	"conference_registration_date" timestamp,
+	"conference_attendance_status" text,
+	"conference_preferences" json,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "job_seeker_pin_unique" UNIQUE("pin"),
@@ -203,6 +259,27 @@ CREATE TABLE "job" (
 	"experience_level" text,
 	"is_active" boolean DEFAULT true,
 	"application_deadline" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "notification_recipient" (
+	"id" text PRIMARY KEY NOT NULL,
+	"bulk_notification_id" text NOT NULL,
+	"job_seeker_id" text NOT NULL,
+	"booth_assignment_id" text,
+	"email_status" text DEFAULT 'pending',
+	"sms_status" text DEFAULT 'pending',
+	"email_sent_at" timestamp,
+	"sms_sent_at" timestamp,
+	"email_delivered_at" timestamp,
+	"sms_delivered_at" timestamp,
+	"email_error" text,
+	"sms_error" text,
+	"email_message_id" text,
+	"sms_message_id" text,
+	"opened" boolean DEFAULT false,
+	"clicked" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -319,8 +396,13 @@ ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_job_seeker_id_
 ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_checkpoint_id_checkpoint_id_fk" FOREIGN KEY ("checkpoint_id") REFERENCES "public"."checkpoint"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attendance_record" ADD CONSTRAINT "attendance_record_verified_by_security_personnel_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."security_personnel"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "booth_assignment" ADD CONSTRAINT "booth_assignment_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "booth_assignment" ADD CONSTRAINT "booth_assignment_booth_id_booth_id_fk" FOREIGN KEY ("booth_id") REFERENCES "public"."booth"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "booth_assignment" ADD CONSTRAINT "booth_assignment_interview_slot_id_interview_slot_id_fk" FOREIGN KEY ("interview_slot_id") REFERENCES "public"."interview_slot"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "booth_assignment" ADD CONSTRAINT "booth_assignment_assigned_by_user_id_fk" FOREIGN KEY ("assigned_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "booth" ADD CONSTRAINT "booth_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "booth" ADD CONSTRAINT "booth_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "bulk_notification" ADD CONSTRAINT "bulk_notification_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "candidate_interaction" ADD CONSTRAINT "candidate_interaction_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -342,6 +424,9 @@ ALTER TABLE "job_application" ADD CONSTRAINT "job_application_reviewed_by_user_i
 ALTER TABLE "job_seeker" ADD CONSTRAINT "job_seeker_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "job" ADD CONSTRAINT "job_employer_id_employer_id_fk" FOREIGN KEY ("employer_id") REFERENCES "public"."employer"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "job" ADD CONSTRAINT "job_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification_recipient" ADD CONSTRAINT "notification_recipient_bulk_notification_id_bulk_notification_id_fk" FOREIGN KEY ("bulk_notification_id") REFERENCES "public"."bulk_notification"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification_recipient" ADD CONSTRAINT "notification_recipient_job_seeker_id_job_seeker_id_fk" FOREIGN KEY ("job_seeker_id") REFERENCES "public"."job_seeker"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "notification_recipient" ADD CONSTRAINT "notification_recipient_booth_assignment_id_booth_assignment_id_fk" FOREIGN KEY ("booth_assignment_id") REFERENCES "public"."booth_assignment"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notification" ADD CONSTRAINT "notification_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "security_incident" ADD CONSTRAINT "security_incident_event_id_event_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."event"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "security_incident" ADD CONSTRAINT "security_incident_reported_by_security_personnel_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."security_personnel"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -359,9 +444,18 @@ CREATE INDEX "attendance_event_idx" ON "attendance_record" USING btree ("event_i
 CREATE INDEX "attendance_checkpoint_idx" ON "attendance_record" USING btree ("checkpoint_id");--> statement-breakpoint
 CREATE INDEX "attendance_time_idx" ON "attendance_record" USING btree ("check_in_time");--> statement-breakpoint
 CREATE INDEX "attendance_verified_by_idx" ON "attendance_record" USING btree ("verified_by");--> statement-breakpoint
+CREATE INDEX "booth_assignment_job_seeker_idx" ON "booth_assignment" USING btree ("job_seeker_id");--> statement-breakpoint
+CREATE INDEX "booth_assignment_booth_idx" ON "booth_assignment" USING btree ("booth_id");--> statement-breakpoint
+CREATE INDEX "booth_assignment_assigned_by_idx" ON "booth_assignment" USING btree ("assigned_by");--> statement-breakpoint
+CREATE INDEX "booth_assignment_status_idx" ON "booth_assignment" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "booth_assignment_date_idx" ON "booth_assignment" USING btree ("interview_date");--> statement-breakpoint
 CREATE INDEX "booth_event_idx" ON "booth" USING btree ("event_id");--> statement-breakpoint
 CREATE INDEX "booth_employer_idx" ON "booth" USING btree ("employer_id");--> statement-breakpoint
 CREATE INDEX "booth_number_idx" ON "booth" USING btree ("booth_number");--> statement-breakpoint
+CREATE INDEX "bulk_notification_created_by_idx" ON "bulk_notification" USING btree ("created_by");--> statement-breakpoint
+CREATE INDEX "bulk_notification_status_idx" ON "bulk_notification" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "bulk_notification_type_idx" ON "bulk_notification" USING btree ("notification_type");--> statement-breakpoint
+CREATE INDEX "bulk_notification_scheduled_idx" ON "bulk_notification" USING btree ("scheduled_at");--> statement-breakpoint
 CREATE INDEX "candidate_interaction_employer_idx" ON "candidate_interaction" USING btree ("employer_id");--> statement-breakpoint
 CREATE INDEX "candidate_interaction_job_seeker_idx" ON "candidate_interaction" USING btree ("job_seeker_id");--> statement-breakpoint
 CREATE INDEX "candidate_interaction_event_idx" ON "candidate_interaction" USING btree ("event_id");--> statement-breakpoint
@@ -377,6 +471,9 @@ CREATE INDEX "employer_verified_idx" ON "employer" USING btree ("is_verified");-
 CREATE INDEX "event_name_idx" ON "event" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "event_date_idx" ON "event" USING btree ("start_date");--> statement-breakpoint
 CREATE INDEX "event_active_idx" ON "event" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX "event_type_idx" ON "event" USING btree ("event_type");--> statement-breakpoint
+CREATE INDEX "event_has_conference_idx" ON "event" USING btree ("has_conference");--> statement-breakpoint
+CREATE INDEX "event_conference_date_idx" ON "event" USING btree ("conference_start_date");--> statement-breakpoint
 CREATE INDEX "feedback_from_user_idx" ON "feedback" USING btree ("from_user_id");--> statement-breakpoint
 CREATE INDEX "feedback_to_user_idx" ON "feedback" USING btree ("to_user_id");--> statement-breakpoint
 CREATE INDEX "feedback_event_idx" ON "feedback" USING btree ("event_id");--> statement-breakpoint
@@ -396,10 +493,20 @@ CREATE INDEX "job_seeker_user_id_idx" ON "job_seeker" USING btree ("user_id");--
 CREATE INDEX "job_seeker_pin_idx" ON "job_seeker" USING btree ("pin");--> statement-breakpoint
 CREATE INDEX "job_seeker_ticket_number_idx" ON "job_seeker" USING btree ("ticket_number");--> statement-breakpoint
 CREATE INDEX "job_seeker_status_idx" ON "job_seeker" USING btree ("registration_status");--> statement-breakpoint
+CREATE INDEX "job_seeker_assignment_status_idx" ON "job_seeker" USING btree ("assignment_status");--> statement-breakpoint
+CREATE INDEX "job_seeker_huawei_student_idx" ON "job_seeker" USING btree ("is_huawei_student");--> statement-breakpoint
+CREATE INDEX "job_seeker_huawei_student_id_idx" ON "job_seeker" USING btree ("huawei_student_id");--> statement-breakpoint
+CREATE INDEX "job_seeker_conference_attendance_idx" ON "job_seeker" USING btree ("wants_to_attend_conference");--> statement-breakpoint
+CREATE INDEX "job_seeker_conference_status_idx" ON "job_seeker" USING btree ("conference_attendance_status");--> statement-breakpoint
 CREATE INDEX "job_employer_idx" ON "job" USING btree ("employer_id");--> statement-breakpoint
 CREATE INDEX "job_event_idx" ON "job" USING btree ("event_id");--> statement-breakpoint
 CREATE INDEX "job_category_idx" ON "job" USING btree ("category");--> statement-breakpoint
 CREATE INDEX "job_active_idx" ON "job" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX "notification_recipient_bulk_idx" ON "notification_recipient" USING btree ("bulk_notification_id");--> statement-breakpoint
+CREATE INDEX "notification_recipient_job_seeker_idx" ON "notification_recipient" USING btree ("job_seeker_id");--> statement-breakpoint
+CREATE INDEX "notification_recipient_booth_assignment_idx" ON "notification_recipient" USING btree ("booth_assignment_id");--> statement-breakpoint
+CREATE INDEX "notification_recipient_email_status_idx" ON "notification_recipient" USING btree ("email_status");--> statement-breakpoint
+CREATE INDEX "notification_recipient_sms_status_idx" ON "notification_recipient" USING btree ("sms_status");--> statement-breakpoint
 CREATE INDEX "notification_user_idx" ON "notification" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "notification_read_idx" ON "notification" USING btree ("is_read");--> statement-breakpoint
 CREATE INDEX "notification_type_idx" ON "notification" USING btree ("type");--> statement-breakpoint

@@ -71,6 +71,28 @@ export const jobSeekers = pgTable(
     // New fields for assignment tracking
     assignmentStatus: text("assignment_status").$type<"unassigned" | "assigned" | "confirmed" | "completed">().default("unassigned"),
     priorityLevel: text("priority_level").$type<"low" | "normal" | "high">().default("normal"),
+    // Huawei Student Certification tracking
+    isHuaweiStudent: boolean("is_huawei_student").default(false),
+    huaweiCertificationLevel: text("huawei_certification_level").$type<"HCIA" | "HCIP" | "HCIE" | "other">(),
+    huaweiCertificationDetails: json("huawei_certification_details").$type<Array<{
+      certificationName: string;
+      certificationId: string;
+      issueDate: string;
+      expiryDate?: string;
+      level: string;
+      status: "active" | "expired" | "pending";
+    }>>(),
+    huaweiStudentId: text("huawei_student_id"), // Huawei student ID number
+    // Conference attendance tracking
+    wantsToAttendConference: boolean("wants_to_attend_conference").default(false),
+    conferenceRegistrationDate: timestamp("conference_registration_date"),
+    conferenceAttendanceStatus: text("conference_attendance_status").$type<"registered" | "confirmed" | "attended" | "no_show" | "cancelled">(),
+    conferencePreferences: json("conference_preferences").$type<{
+      sessionInterests?: string[];
+      dietaryRequirements?: string;
+      accessibilityNeeds?: string;
+      networkingInterests?: string[];
+    }>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -80,6 +102,10 @@ export const jobSeekers = pgTable(
     ticketNumberIdx: index("job_seeker_ticket_number_idx").on(table.ticketNumber),
     statusIdx: index("job_seeker_status_idx").on(table.registrationStatus),
     assignmentStatusIdx: index("job_seeker_assignment_status_idx").on(table.assignmentStatus),
+    huaweiStudentIdx: index("job_seeker_huawei_student_idx").on(table.isHuaweiStudent),
+    huaweiStudentIdIdx: index("job_seeker_huawei_student_id_idx").on(table.huaweiStudentId),
+    conferenceAttendanceIdx: index("job_seeker_conference_attendance_idx").on(table.wantsToAttendConference),
+    conferenceStatusIdx: index("job_seeker_conference_status_idx").on(table.conferenceAttendanceStatus),
   })
 );
 
@@ -124,7 +150,25 @@ export const events = pgTable(
     maxAttendees: integer("max_attendees"),
     registrationDeadline: timestamp("registration_deadline"),
     isActive: boolean("is_active").default(true),
-    eventType: text("event_type").$type<"job_fair" | "career_expo" | "networking">().default("job_fair"),
+    eventType: text("event_type").$type<"job_fair" | "career_expo" | "networking" | "conference">().default("job_fair"),
+    // Conference specific fields
+    hasConference: boolean("has_conference").default(false),
+    conferenceStartDate: timestamp("conference_start_date"),
+    conferenceEndDate: timestamp("conference_end_date"),
+    conferenceVenue: text("conference_venue"),
+    conferenceMaxAttendees: integer("conference_max_attendees"),
+    conferenceRegistrationDeadline: timestamp("conference_registration_deadline"),
+    conferenceDescription: text("conference_description"),
+    conferenceSessions: json("conference_sessions").$type<Array<{
+      id: string;
+      title: string;
+      description: string;
+      speaker: string;
+      startTime: string;
+      endTime: string;
+      venue: string;
+      maxAttendees?: number;
+    }>>(),
     createdBy: text("created_by").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -133,6 +177,9 @@ export const events = pgTable(
     nameIdx: index("event_name_idx").on(table.name),
     dateIdx: index("event_date_idx").on(table.startDate),
     activeIdx: index("event_active_idx").on(table.isActive),
+    eventTypeIdx: index("event_type_idx").on(table.eventType),
+    hasConferenceIdx: index("event_has_conference_idx").on(table.hasConference),
+    conferenceDateIdx: index("event_conference_date_idx").on(table.conferenceStartDate),
   })
 );
 

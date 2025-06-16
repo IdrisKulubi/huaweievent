@@ -4,7 +4,8 @@ import db from "@/db/drizzle";
 import { 
   users, 
   systemLogs,
-  events
+  events,
+  jobSeekers
 } from "@/db/schema";
 import { eq, count, sql, desc, gte, and } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,7 +59,11 @@ export default async function SystemReportsPage() {
     usersByRole,
     recentLogs,
     dailyActivity,
-    systemHealth
+    systemHealth,
+    totalJobSeekers,
+    huaweiStudents,
+    conferenceAttendees,
+    huaweiConferenceAttendees
   ] = await Promise.all([
     // Total users
     db.select({ count: count() }).from(users),
@@ -138,7 +143,33 @@ export default async function SystemReportsPage() {
       storage: { status: 'healthy', usage: 67 },
       memory: { status: 'warning', usage: 85 },
       network: { status: 'healthy', latency: 12 }
-    })
+    }),
+
+    // Total job seekers
+    db.select({ count: count() })
+      .from(jobSeekers)
+      .innerJoin(users, eq(users.id, jobSeekers.userId)),
+    
+    // Huawei students
+    db.select({ count: count() })
+      .from(jobSeekers)
+      .innerJoin(users, eq(users.id, jobSeekers.userId))
+      .where(eq(jobSeekers.isHuaweiStudent, true)),
+    
+    // Conference attendees
+    db.select({ count: count() })
+      .from(jobSeekers)
+      .innerJoin(users, eq(users.id, jobSeekers.userId))
+      .where(eq(jobSeekers.wantsToAttendConference, true)),
+    
+    // Huawei students attending conference
+    db.select({ count: count() })
+      .from(jobSeekers)
+      .innerJoin(users, eq(users.id, jobSeekers.userId))
+      .where(and(
+        eq(jobSeekers.isHuaweiStudent, true),
+        eq(jobSeekers.wantsToAttendConference, true)
+      ))
   ]);
 
   // Calculate system metrics
@@ -159,7 +190,11 @@ export default async function SystemReportsPage() {
       systemLogsCount: systemLogsCount[0]?.count || 0,
       errorLogsCount: errorLogsCount[0]?.count || 0,
       systemReliability,
-      errorRate
+      errorRate,
+      totalJobSeekers: totalJobSeekers[0]?.count || 0,
+      huaweiStudents: huaweiStudents[0]?.count || 0,
+      conferenceAttendees: conferenceAttendees[0]?.count || 0,
+      huaweiConferenceAttendees: huaweiConferenceAttendees[0]?.count || 0,
     },
     usersByRole,
     recentLogs: recentLogs.slice(0, 20),
@@ -329,6 +364,91 @@ export default async function SystemReportsPage() {
               </div>
               <p className="text-purple-100 text-sm mt-1">
                 Total actions (7 days)
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Huawei Student & Conference Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium opacity-90 flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Job Seekers
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {(totalJobSeekers[0]?.count || 0).toLocaleString()}
+              </div>
+              <p className="text-indigo-100 text-sm mt-1">
+                Total registered
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium opacity-90 flex items-center gap-2">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                  <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                </svg>
+                Huawei Students
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {(huaweiStudents[0]?.count || 0).toLocaleString()}
+              </div>
+              <p className="text-purple-100 text-sm mt-1">
+                {totalJobSeekers[0]?.count > 0 
+                  ? Math.round(((huaweiStudents[0]?.count || 0) / totalJobSeekers[0].count) * 100)
+                  : 0}% of job seekers
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium opacity-90 flex items-center gap-2">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                Conference Attendees
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {(conferenceAttendees[0]?.count || 0).toLocaleString()}
+              </div>
+              <p className="text-emerald-100 text-sm mt-1">
+                {totalJobSeekers[0]?.count > 0 
+                  ? Math.round(((conferenceAttendees[0]?.count || 0) / totalJobSeekers[0].count) * 100)
+                  : 0}% of job seekers
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium opacity-90 flex items-center gap-2">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Huawei + Conference
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {(huaweiConferenceAttendees[0]?.count || 0).toLocaleString()}
+              </div>
+              <p className="text-rose-100 text-sm mt-1">
+                {huaweiStudents[0]?.count > 0 
+                  ? Math.round(((huaweiConferenceAttendees[0]?.count || 0) / huaweiStudents[0].count) * 100)
+                  : 0}% of Huawei students
               </p>
             </CardContent>
           </Card>

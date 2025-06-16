@@ -54,7 +54,7 @@ export function LoginCard() {
                 </span>
               </h1>
               <p className="text-sm text-slate-600 dark:text-slate-300">
-                Sign in to access the Huawei Career Summit platform
+                Sign in to access the Nation-Huawei Leap Job Fair 2025
               </p>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function LoginCard() {
             </div>
             <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-3 text-center">
               <MapPin className="w-4 h-4 text-blue-600 mx-auto mb-1" />
-              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">UON Grounds</p>
+              <p className="text-xs font-medium text-slate-900 dark:text-slate-100">UON Graduation Square</p>
               <p className="text-xs text-slate-600 dark:text-slate-400">Nairobi</p>
             </div>
           </div>
