@@ -102,7 +102,7 @@ export function EventManagement() {
           address: eventData.address || "",
           maxAttendees: eventData.maxAttendees || 0,
           isActive: eventData.isActive ?? true,
-          eventType: eventData.eventType || "job_fair",
+          eventType: (eventData.eventType as "job_fair" | "career_expo" | "networking") || "job_fair",
           currentAttendees: eventData.currentAttendees || 0,
           checkedInAttendees: eventData.checkedInAttendees || 0,
           startDate: new Date(eventData.startDate).toISOString().split('T')[0],

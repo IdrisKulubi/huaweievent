@@ -130,11 +130,11 @@ export function ConferenceSection() {
           <div className="flex flex-wrap justify-center gap-6 text-sm">
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
               <Calendar className="w-4 h-4 text-indigo-600" />
-              <span className="font-medium">Day Before Job Fair</span>
+              <span className="font-medium">Same Day as Job Fair</span>
             </div>
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
               <Clock className="w-4 h-4 text-indigo-600" />
-              <span className="font-medium">8:00 AM - 5:00 PM</span>
+              <span className="font-medium">Morning before Job Fair</span>
             </div>
             <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
               <MapPin className="w-4 h-4 text-indigo-600" />
@@ -195,40 +195,7 @@ export function ConferenceSection() {
           })}
         </div>
 
-        {/* Conference Schedule */}
-        <div className={`bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xl border border-slate-200 dark:border-slate-700 transition-all duration-1000 delay-500 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-              Conference Schedule
-            </h3>
-            <p className="text-slate-600 dark:text-slate-300">
-              A full day of learning, networking, and career development
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {conferenceSchedule.map((item, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-              >
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                </div>
-                <div>
-                  <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-sm">
-                    {item.time}
-                  </div>
-                  <div className="text-slate-700 dark:text-slate-300 text-sm">
-                    {item.activity}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+       
 
         {/* Call to Action */}
         <div className={`text-center mt-16 transition-all duration-1000 delay-700 ${isVisible ? 'animate-fade-in-up opacity-100' : 'opacity-0'}`}>

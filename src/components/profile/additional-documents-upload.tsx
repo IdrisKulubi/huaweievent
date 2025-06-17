@@ -25,6 +25,20 @@ interface AdditionalDocumentsUploadProps {
   maxDocuments?: number;
 }
 
+const ALLOWED_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'text/plain',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+];
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export function AdditionalDocumentsUpload({ 
   onDocumentsChange, 
   currentDocuments = [], 
@@ -36,27 +50,13 @@ export function AdditionalDocumentsUpload({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const allowedTypes = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'text/plain',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  ];
-
-  const maxFileSize = 10 * 1024 * 1024; // 10MB
-
   const handleFileSelect = useCallback(async (file: File) => {
     const validateFile = (file: File): string | null => {
-      if (!allowedTypes.includes(file.type)) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
         return "Please upload a supported document type (PDF, DOC, DOCX, JPG, PNG, GIF, TXT, XLS, XLSX)";
       }
       
-      if (file.size > maxFileSize) {
+      if (file.size > MAX_FILE_SIZE) {
         return "File size must be less than 10MB";
       }
       

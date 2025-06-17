@@ -518,7 +518,7 @@ export function ProfileSetupForm({ user }: ProfileSetupFormProps) {
                   <div>
                     <h5 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Almost Done!</h5>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Great progress! Next, you'll share your Huawei student status and conference preferences, plus your availability details.
+                      Great progress! Next, you&apos;ll share your Huawei student status and conference preferences, plus your availability details.
                     </p>
                   </div>
                 </div>
