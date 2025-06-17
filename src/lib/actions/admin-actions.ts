@@ -1051,3 +1051,182 @@ export async function createNotification(params: {
     throw new Error("Failed to create notification");
   }
 }
+
+export async function changeUserRole(userId: string, newRole: "job_seeker" | "employer" | "admin" | "security") {
+  await ensureAdminAccess();
+
+  try {
+    // Get current user data for logging
+    const currentUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!currentUser[0]) {
+      throw new Error("User not found");
+    }
+
+    const oldRole = currentUser[0].role;
+
+    // Update user role
+    await db
+      .update(users)
+      .set({ 
+        role: newRole,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId));
+
+    // Log the action
+    await logSystemAction({
+      action: "change_user_role",
+      resource: "user",
+      resourceId: userId,
+      details: { 
+        oldRole, 
+        newRole,
+        userName: currentUser[0].name,
+        userEmail: currentUser[0].email
+      }
+    });
+
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/users/roles");
+    return { success: true, message: "User role updated successfully" };
+  } catch (error) {
+    console.error("Error changing user role:", error);
+    throw new Error("Failed to change user role");
+  }
+}
+
+export async function toggleUserStatus(userId: string) {
+  await ensureAdminAccess();
+
+  try {
+    // Get current user data
+    const currentUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!currentUser[0]) {
+      throw new Error("User not found");
+    }
+
+    const newStatus = !currentUser[0].isActive;
+
+    // Update user status
+    await db
+      .update(users)
+      .set({ 
+        isActive: newStatus,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId));
+
+    // Log the action
+    await logSystemAction({
+      action: newStatus ? "activate_user" : "deactivate_user",
+      resource: "user",
+      resourceId: userId,
+      details: { 
+        userName: currentUser[0].name,
+        userEmail: currentUser[0].email,
+        newStatus
+      }
+    });
+
+    revalidatePath("/admin/users");
+    return { 
+      success: true, 
+      message: `User ${newStatus ? 'activated' : 'deactivated'} successfully` 
+    };
+  } catch (error) {
+    console.error("Error toggling user status:", error);
+    throw new Error("Failed to update user status");
+  }
+}
+
+export async function deleteUser(userId: string) {
+  await ensureAdminAccess();
+
+  try {
+    // Get current user data for logging
+    const currentUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!currentUser[0]) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is an admin (prevent deleting other admins)
+    if (currentUser[0].role === "admin") {
+      throw new Error("Cannot delete admin users");
+    }
+
+    // Start transaction to delete user and related data
+    await db.transaction(async (tx) => {
+      // Delete related job seeker data if exists
+      await tx.delete(jobSeekers).where(eq(jobSeekers.userId, userId));
+      
+      // Delete related employer data if exists
+      await tx.delete(employers).where(eq(employers.userId, userId));
+      
+      // Delete the user
+      await tx.delete(users).where(eq(users.id, userId));
+    });
+
+    // Log the action
+    await logSystemAction({
+      action: "delete_user",
+      resource: "user",
+      resourceId: userId,
+      details: { 
+        userName: currentUser[0].name,
+        userEmail: currentUser[0].email,
+        userRole: currentUser[0].role
+      }
+    });
+
+    revalidatePath("/admin/users");
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw new Error("Failed to delete user");
+  }
+}
+
+export async function getUserDetails(userId: string) {
+  await ensureAdminAccess();
+
+  try {
+    const userDetails = await db
+      .select({
+        user: users,
+        jobSeeker: jobSeekers,
+        employer: employers
+      })
+      .from(users)
+      .leftJoin(jobSeekers, eq(jobSeekers.userId, users.id))
+      .leftJoin(employers, eq(employers.userId, users.id))
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!userDetails[0]) {
+      throw new Error("User not found");
+    }
+
+    return {
+      success: true,
+      data: userDetails[0]
+    };
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    throw new Error("Failed to fetch user details");
+  }
+}
