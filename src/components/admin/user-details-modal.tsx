@@ -19,17 +19,15 @@ import {
   Mail, 
   Phone, 
   Calendar, 
-  MapPin, 
   Building, 
-  GraduationCap, 
-  Briefcase, 
+  
   Star, 
-  FileText, 
+  
   Globe, 
   Linkedin, 
   Shield,
   UserCheck,
-  Clock,
+  
   Activity,
   CheckCircle,
   XCircle,
@@ -47,12 +45,12 @@ interface UserDetailsModalProps {
 interface UserData {
   user: {
     id: string;
-    name: string;
-    email: string;
-    role: string;
-    isActive: boolean;
-    phoneNumber?: string;
-    image?: string;
+    name: string | null;
+    email: string | null;
+    role: string | null;
+    isActive: boolean | null;
+    phoneNumber?: string | null;
+    image?: string | null;
     createdAt: Date;
     lastActive: Date;
     updatedAt: Date;
@@ -108,7 +106,7 @@ export function UserDetailsModal({ trigger, userId }: UserDetailsModalProps) {
     try {
       const result = await getUserDetails(userId);
       if (result.success) {
-        setUserData(result.data);
+        setUserData(result.data as UserData);
       } else {
         setError("Failed to fetch user details");
       }
@@ -192,24 +190,24 @@ export function UserDetailsModal({ trigger, userId }: UserDetailsModalProps) {
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarImage src={userData.user.image} alt={userData.user.name} />
+                    <AvatarImage src={userData.user.image || ''} alt={userData.user.name || ''} />
                     <AvatarFallback className="text-lg">
-                      {userData.user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      {(userData.user.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-xl font-semibold text-gray-900">{userData.user.name}</h3>
-                      <Badge className={getRoleColor(userData.user.role)}>
-                        {userData.user.role.replace('_', ' ')}
+                      <Badge className={getRoleColor(userData.user.role || 'job_seeker')}>
+                        {(userData.user.role || 'job_seeker').replace('_', ' ')}
                       </Badge>
                       <div className="flex items-center gap-1">
                         {(() => {
-                          const StatusIcon = getStatusIcon(userData.user.isActive);
-                          return <StatusIcon className={`h-4 w-4 ${getStatusColor(userData.user.isActive)}`} />;
+                          const StatusIcon = getStatusIcon(userData.user.isActive || false);
+                          return <StatusIcon className={`h-4 w-4 ${getStatusColor(userData.user.isActive || false)}`} />;
                         })()}
-                        <span className={`text-sm ${getStatusColor(userData.user.isActive)}`}>
+                        <span className={`text-sm ${getStatusColor(userData.user.isActive || false)}`}>
                           {userData.user.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>

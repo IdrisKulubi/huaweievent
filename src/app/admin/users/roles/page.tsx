@@ -6,7 +6,7 @@ import { eq, desc, count, sql } from "drizzle-orm";
 import { RolesClientPage } from "./client-page";
 
 // Define role permissions
-export const rolePermissions = {
+const rolePermissions = {
   admin: {
     name: "Administrator",
     description: "Full system access with all privileges",
