@@ -44,7 +44,7 @@ export function Navigation() {
             <Link href="/" className="flex items-center group">
               <div className="relative">
                 <Image
-                  src="/huaweilogo.jpg"
+                  src="https://res.cloudinary.com/db0i0umxn/image/upload/v1750154851/huaweilogo_jrvcs6.jpg"
                   alt="Nation-Huawei Leap Job Fair"
                   width={160}
                   height={100}
