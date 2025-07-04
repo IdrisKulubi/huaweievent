@@ -35,7 +35,14 @@ export async function middleware(request: Request & { nextUrl: URL }) {
       try {
         const userProfile = await getUserProfile(session.user.id);
         
-        if (userProfile?.profileComplete) {
+        // Role-based redirection after login
+        if (userProfile?.role === "admin") {
+          return NextResponse.redirect(new URL("/admin", request.url));
+        } else if (userProfile?.role === "employer") {
+          return NextResponse.redirect(new URL("/employer/setup", request.url));
+        } else if (userProfile?.role === "security") {
+          return NextResponse.redirect(new URL("/security/setup", request.url));
+        } else if (userProfile?.profileComplete) {
           return NextResponse.redirect(new URL("/dashboard", request.url));
         } else {
           return NextResponse.redirect(new URL("/profile-setup", request.url));
@@ -46,32 +53,57 @@ export async function middleware(request: Request & { nextUrl: URL }) {
       }
     }
 
-    // Check if user needs to complete profile setup
-    if (!pathname.startsWith("/profile-setup")) {
-      try {
-        const userProfile = await getUserProfile(session.user.id);
-        
-        // If user doesn't have a completed profile, redirect to setup
-        if (!userProfile?.profileComplete) {
-          return NextResponse.redirect(new URL("/profile-setup", request.url));
-        }
-      } catch (error) {
-        console.error("Error checking user profile in middleware:", error);
-        // If there's an error, allow them to proceed (fail safely)
-      }
-    }
-
-    // If user has completed profile but is trying to access setup page, redirect to dashboard
+    // Role-based profile setup access control
     if (pathname.startsWith("/profile-setup")) {
       try {
         const userProfile = await getUserProfile(session.user.id);
         
-        if (userProfile?.profileComplete) {
+        // Only job seekers should access the general profile setup
+        if (userProfile?.role && userProfile.role !== "job_seeker") {
+          // Redirect to appropriate role-specific setup or dashboard
+          if (userProfile.role === "admin") {
+            return NextResponse.redirect(new URL("/admin", request.url));
+          } else if (userProfile.role === "employer") {
+            return NextResponse.redirect(new URL("/employer/setup", request.url));
+          } else if (userProfile.role === "security") {
+            return NextResponse.redirect(new URL("/security/setup", request.url));
+          }
+        }
+        
+        // If job seeker has completed profile, redirect to dashboard
+        if (userProfile?.profileComplete && userProfile.role === "job_seeker") {
           return NextResponse.redirect(new URL("/dashboard", request.url));
         }
       } catch (error) {
         console.error("Error checking user profile in middleware:", error);
         // If there's an error, allow them to access setup page
+      }
+    }
+
+    // Check if user needs to complete profile setup (only for job seekers)
+    if (!pathname.startsWith("/profile-setup") && 
+        !pathname.startsWith("/admin") && 
+        !pathname.startsWith("/employer") && 
+        !pathname.startsWith("/security")) {
+      try {
+        const userProfile = await getUserProfile(session.user.id);
+        
+        // If user doesn't have a completed profile and is a job seeker, redirect to setup
+        if (!userProfile?.profileComplete && userProfile?.role === "job_seeker") {
+          return NextResponse.redirect(new URL("/profile-setup", request.url));
+        }
+        
+        // Role-based dashboard redirections for incomplete setups
+        if (userProfile?.role === "employer" && !userProfile.profileComplete) {
+          return NextResponse.redirect(new URL("/employer/setup", request.url));
+        }
+        
+        if (userProfile?.role === "security" && !userProfile.profileComplete) {
+          return NextResponse.redirect(new URL("/security/setup", request.url));
+        }
+      } catch (error) {
+        console.error("Error checking user profile in middleware:", error);
+        // If there's an error, allow them to proceed (fail safely)
       }
     }
   }

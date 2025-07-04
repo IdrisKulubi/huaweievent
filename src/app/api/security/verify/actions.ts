@@ -68,12 +68,25 @@ export async function verifyAttendeePin(pin: string, securityId: string) {
     }
 
     const attendee = jobSeeker[0];
+    const originalStatus = attendee.registrationStatus;
 
-    // Check if attendee is approved
-    if (attendee.registrationStatus !== "approved") {
+    // Auto-approve attendee if they have a valid PIN but are still pending
+    if (attendee.registrationStatus === "pending") {
+      // Update registration status to approved since they have valid credentials
+      await db
+        .update(jobSeekers)
+        .set({ 
+          registrationStatus: "approved",
+          updatedAt: new Date()
+        })
+        .where(eq(jobSeekers.id, attendee.id));
+      
+      // Update the attendee object for the response
+      attendee.registrationStatus = "approved";
+    } else if (attendee.registrationStatus === "rejected") {
       return {
         success: false,
-        message: `Attendee registration is ${attendee.registrationStatus}. Cannot check in.`
+        message: `Attendee registration was rejected. Please contact administration.`
       };
     }
 
@@ -131,7 +144,9 @@ export async function verifyAttendeePin(pin: string, securityId: string) {
       success: true,
       message: alreadyCheckedIn 
         ? "Attendee was already checked in, but verification logged."
-        : "Attendee successfully verified and checked in.",
+        : originalStatus === "pending"
+          ? "Attendee automatically approved and checked in successfully."
+          : "Attendee successfully verified and checked in.",
       attendee: {
         id: attendee.id,
         name: attendee.userName,
@@ -190,12 +205,25 @@ export async function verifyAttendeeTicket(ticketNumber: string, securityId: str
     }
 
     const attendee = jobSeeker[0];
+    const originalStatus = attendee.registrationStatus;
 
-    // Check if attendee is approved
-    if (attendee.registrationStatus !== "approved") {
+    // Auto-approve attendee if they have a valid ticket but are still pending
+    if (attendee.registrationStatus === "pending") {
+      // Update registration status to approved since they have valid credentials
+      await db
+        .update(jobSeekers)
+        .set({ 
+          registrationStatus: "approved",
+          updatedAt: new Date()
+        })
+        .where(eq(jobSeekers.id, attendee.id));
+      
+      // Update the attendee object for the response
+      attendee.registrationStatus = "approved";
+    } else if (attendee.registrationStatus === "rejected") {
       return {
         success: false,
-        message: `Attendee registration is ${attendee.registrationStatus}. Cannot check in.`
+        message: `Attendee registration was rejected. Please contact administration.`
       };
     }
 
@@ -250,7 +278,9 @@ export async function verifyAttendeeTicket(ticketNumber: string, securityId: str
       success: true,
       message: alreadyCheckedIn 
         ? "Attendee was already checked in, but verification logged."
-        : "Attendee successfully verified and checked in.",
+        : originalStatus === "pending"
+          ? "Attendee automatically approved and checked in successfully."
+          : "Attendee successfully verified and checked in.",
       attendee: {
         id: attendee.id,
         name: attendee.userName,
