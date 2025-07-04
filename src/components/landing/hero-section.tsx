@@ -59,7 +59,7 @@ export function HeroSection() {
                 <Calendar className="w-5 h-5 text-[var(--huawei-red)]" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Date</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">Jun 26-27, 2025</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">July 8th, 2025</p>
                 </div>
               </div>
               

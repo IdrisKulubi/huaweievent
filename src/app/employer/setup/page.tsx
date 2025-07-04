@@ -19,9 +19,7 @@ export default async function EmployerSetupPage() {
     .where(eq(users.id, session.user.id))
     .limit(1);
 
-  if (!user[0] || user[0].role !== "employer") {
-    redirect("/dashboard");
-  }
+ 
 
   // Check if employer profile already exists
   const existingProfile = await db

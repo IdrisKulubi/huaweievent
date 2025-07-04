@@ -211,7 +211,7 @@ export function TimelineSection() {
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
-              Day 1 - June 26, 2025
+              Day 1 - July 8th, 2025
             </button>
             <button
               onClick={() => setActiveDay(2)}
@@ -221,7 +221,7 @@ export function TimelineSection() {
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
               }`}
             >
-              Day 2 - June 27, 2025
+              Day 2 - July 8th, 2025
             </button>
           </div>
         </div>

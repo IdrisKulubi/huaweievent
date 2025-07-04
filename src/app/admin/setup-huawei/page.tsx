@@ -104,7 +104,7 @@ export default async function HuaweiSetupPage() {
                 <Calendar className="h-8 w-8 text-green-600 mx-auto mb-2" />
                 <h3 className="font-semibold text-green-900">Event Dates</h3>
                 <p className="text-green-800 text-sm">
-                  {eventStatus.event?.startDate ? new Date(eventStatus.event.startDate).toLocaleDateString() : 'Jun 5-6, 2025'}
+                  {eventStatus.event?.startDate ? new Date(eventStatus.event.startDate).toLocaleDateString() : 'July 8th, 2025'}
                 </p>
               </div>
               <div className="text-center">
@@ -190,7 +190,7 @@ export default async function HuaweiSetupPage() {
               <ul className="space-y-2 text-yellow-800">
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-yellow-600 rounded-full"></div>
-                  Event details for June 5-6, 2025 at UON Graduation Square
+                  Event details for July 8th, 2025 at UON Graduation Square
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-yellow-600 rounded-full"></div>
@@ -341,7 +341,7 @@ export default async function HuaweiSetupPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-red-800">Dates:</span>
-                  <span className="font-medium text-red-900">June 5-6, 2025</span>
+                  <span className="font-medium text-red-900">July 8th, 2025</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-red-800">Venue:</span>

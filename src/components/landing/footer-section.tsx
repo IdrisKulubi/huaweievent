@@ -157,7 +157,7 @@ export function FooterSection() {
                   <Calendar className="w-5 h-5 text-[var(--huawei-red)]" />
                   <span className="font-medium text-white">Event Dates</span>
                 </div>
-                <p className="text-sm text-slate-300">June 26-27, 2025</p>
+                <p className="text-sm text-slate-300">July 8th, 2025</p>
                 <p className="text-sm text-slate-300">Two days of opportunities</p>
               </div>
               
